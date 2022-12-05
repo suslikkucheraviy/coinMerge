@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Local</title>
+  <meta name="viewport" content="width=device-width,
+    user-scalable=no, initial-scale=1, maximum-scale=1, user-scalable=0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <script src="/static/js/matter.js"></script>
+  <style>
+    canvas {
+      border:1px solid #d3d3d3;
+      background-color: #f1f1f1;
+      display: block;
+      margin: 0 auto;
+    }
+
+    body, html{
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      background-color: #d3d3d3;
+      padding: 0px;
+      margin: 0px;
+      overflow: hidden;
+    }
+
+    #score {
+      position: fixed;
+      top: 5%;
+      left: 5%;
+      font-family: Arial;
+      font-weight: bolder;
+      font-size: 30pt;
+    }
+
+    .centered {
+      position: fixed;
+      height: 100%;
+      width: 100%;
+      top: 50%;
+      left: 50%;
+      background-color: rgba(255,255,255,0.8);
+      transform: translate(-50%, -50%);
+
+    }
+
+    .centered div{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 40pt;
+    }
+
+    #gameover{
+      visibility: hidden;
+    }
+    /*.dogecoin{*/
+    /*    position: absolute;*/
+    /*    width: 20px;*/
+    /*    height: 20px;*/
+    /*    top:20px;*/
+    /*    bottom: 20px;*/
+    /*    background-image: url("assets/dogecoin.png");*/
+    /*    background-color: #f1f1f1;*/
+    /*    z-index: 99;*/
+    /*}*/
+  </style>
+</head>
+<body onload="startGame()">
+<script>
+    var best_score=0;
+    var _uid= "";
+</script>
+<div id="score">0</div>
+<div id="gameover" class="centered">
+  <div>
+    <span onclick="startGame()">GameOver</span>
+  </div>
+</div>
+<script src="/static/js/game.js"></script>
+</body>
+</html>

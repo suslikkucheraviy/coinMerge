@@ -1,0 +1,8 @@
+{'callback_query':
+{'game_short_name': 'coinmergetest', 'message':
+{'caption_entities': [],
+'chat': {'first_name': 'Mihail', 'last_name': 'Duscu', 'username': 'mihail_duscu', 'id': 675756625, 'type': 'private'},
+'entities': [],
+'group_chat_created': False,
+'photo': [],
+'game': {'description': 'Testing a game', 'title': 'TestCoinMerge', 'photo': [{'file_id': 'AgACAgQAAxUAAWON99nZ31QjB61FcbHKAphaj_N8AAIqujEbOtixUwjTQsvhzUm9AQADAgADcwADKwQ', 'file_unique_id': 'AQADKroxGzrYsVN4', 'file_size': 1411, 'height': 51, 'width': 90}, {'file_id': 'AgACAgQAAxUAAWON99nZ31QjB61FcbHKAphaj_N8AAIqujEbOtixUwjTQsvhzUm9AQADAgADbQADKwQ', 'file_unique_id': 'AQADKroxGzrYsVNy', 'file_size': 9437, 'height': 180, 'width': 320}, {'file_id': 'AgACAgQAAxUAAWON99nZ31QjB61FcbHKAphaj_N8AAIqujEbOtixUwjTQsvhzUm9AQADAgADeAADKwQ', 'file_unique_id': 'AQADKroxGzrYsVN9', 'file_size': 18416, 'height': 360, 'width': 640}], 'text_entities': []}, 'delete_chat_photo': False, 'new_chat_members': [], 'channel_chat_created': False, 'new_chat_photo': [], 'supergroup_chat_created': False, 'reply_markup': {'inline_keyboard': [[{'callback_game': {}, 'text': 'Play TestCoinMerge'}]]}, 'message_id': 37, 'date': 1670248409, 'from': {'first_name': 'TestCoinMerge', 'username': 'TestCoinMerge_bot', 'id': 5694657024, 'is_bot': True}}, 'chat_instance': '-8644649095845145643', 'id': '2902352607173211387', 'from': {'first_name': 'Mihail', 'language_code': 'ru', 'last_name': 'Duscu', 'username': 'mihail_duscu', 'id': 675756625, 'is_bot': False}}, 'update_id': 489764301}
