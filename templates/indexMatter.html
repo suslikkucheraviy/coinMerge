@@ -7,9 +7,20 @@
     user-scalable=no, initial-scale=1, maximum-scale=1, user-scalable=0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
+    <script src="https://telegram.org/js/games.js"></script>
   <script src="/static/js/matter.js"></script>
   <style>
+
+    @font-face {
+      font-family: GameFont;
+      src: url(/static/fonts/Paytone_One/PaytoneOne-Regular.ttf);
+    }
+
+    @font-face {
+      font-family: BuddyScoreFont;
+      src: url(/static/fonts/Anek_Gurmukhi/static/AnekGurmukhi/AnekGurmukhi-Regular.ttf);
+    }
+
     canvas {
       border:1px solid #d3d3d3;
       background-color: #f1f1f1;
@@ -21,19 +32,45 @@
       width: 100%;
       height: 100%;
       position: fixed;
-      background-color: #d3d3d3;
+      /*background-color: #d3d3d3;*/
       padding: 0px;
       margin: 0px;
       overflow: hidden;
+    }
+
+    #dashboard{
+      position: relative;
+      height: 100%;
+      width: 100%;
+      background-color: white;
     }
 
     #score {
       position: fixed;
       top: 5%;
       left: 5%;
-      font-family: Arial;
+      font-family: GameFont;
       font-weight: bolder;
-      font-size: 30pt;
+      font-size: 28pt;
+    }
+
+    #game_title{
+      font-family: GameFont;
+      font-size: 28pt;
+    }
+
+    .share{
+      margin-top: 20px;
+      color: white;
+      font-family: BuddyScoreFont;
+      font-size: 15pt;
+      width: 80%;
+      background-color: dodgerblue;
+      text-align: center;
+      padding-top: 3px;
+      height: 40px;
+      line-height: 40px;
+      border-radius: 15px;
     }
 
     .centered {
@@ -47,19 +84,140 @@
 
     }
 
-    .centered div{
+    #startgame{
+
+      width: 100%;
+      height: 100%;
       display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+
+    }
+
+    .centered{
+      display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100%;
       width: 100%;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      font-size: 40pt;
     }
 
     #gameover{
       visibility: hidden;
+      /*visibility: visible;*/
     }
+
+    #dashboard{
+      display: inline-block;
+    }
+
+    #game_buddies{
+      margin-top: 20px;
+      display: flex;
+      width: 90%;
+      flex: 0 1 auto;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.05);
+      padding-top: 20px;
+      padding-bottom: 20px;
+      padding-left: 10px;
+      padding-right: 10px;
+      border-radius: 15px;
+    }
+
+    #game_buddies_list{
+        margin-top: 20px;
+        display: flex;
+        width: 100%;
+        overflow-x: auto;
+        justify-content: center;
+    }
+
+    .buddy{
+      /*background-color: red;*/
+      display: flex;
+      /*justify-content: center;*/
+      align-items: center;
+      flex-direction: column;
+      margin-left: 2px;
+      margin-right: 2px;
+    }
+
+    .buddy_logo img{
+      height: 50px;
+      width: 50px;
+      border-radius: 50%;
+    }
+
+    .buddy_score{
+      font-family: BuddyScoreFont;
+    }
+
+    .bestScore{
+      display: flex;
+      flex-direction: column;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 20pt;
+    }
+
+    .play-button-outer {
+        /*margin: 25% auto;*/
+        position: absolute;
+        width: 60%;
+        height: 50px;
+        background-color: gold;
+        border: solid 2px;
+        border-color: black;
+        cursor: pointer;
+        border-radius: 15px;
+        bottom: 10%;
+    }
+
+    .play-button {
+      margin: 0 auto;
+      top: 25%;
+      position: relative;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 15px 0 15px 25px;
+      border-color: transparent transparent transparent white;
+      opacity: 1;
+    }
+
+    .play-button-outer:hover {
+      background-color: rgba(0, 0, 0, .5);
+    }
+
+    .play-button-outer:hover .play-button {
+      opacity: 1;
+    }
+
+    .current_score_label{
+      font-family: GameFont;
+      font-size: 18pt;
+    }
+
+    #current_score_value{
+      font-family: GameFont;
+      font-size: 24pt;
+    }
+
+    .best_score_label{
+      margin-top: 30px;
+      font-family: BuddyScoreFont;
+      font-size: 16pt;
+    }
+
+    #best_score_value{
+      font-family: BuddyScoreFont;
+      font-size: 18pt;
+    }
+
     /*.dogecoin{*/
     /*    position: absolute;*/
     /*    width: 20px;*/
@@ -72,15 +230,36 @@
     /*}*/
   </style>
 </head>
-<body onload="startGame()">
+<body onload="getLeadBoard()">
 <script>
-    var best_score=0;
-    var _uid= "";
+    window.best_score={{ bestScore }};
+    window._uid= "{{ userid }}";
 </script>
 <div id="score">0</div>
+<div id="dashboard">
+  <div id="startgame">
+      <div id="game_title">Coin Merge</div>
+      <div id="game_buddies">
+        <div id="game_buddies_list">
+
+        </div>
+        <div class="share" onclick="TelegramGameProxy.shareScore()">Share with friends</div>
+      </div>
+      <div class="play-button-outer" onclick="startGame()">
+        <div class="play-button"></div>
+      </div>
+  </div>
+</div>
+</div>
+
 <div id="gameover" class="centered">
-  <div>
-    <span onclick="startGame()">GameOver</span>
+  <span class="current_score_label">Your score</span>
+  <span id="current_score_value">100</span>
+  <span class="best_score_label">Your best score</span>
+  <span id="best_score_value">100</span>
+  <div class="share" onclick="TelegramGameProxy.shareScore()">Share with friends</div>
+  <div class="play-button-outer" onclick="startGame()">
+        <div class="play-button"></div>
   </div>
 </div>
 <script src="/static/js/game.js"></script>

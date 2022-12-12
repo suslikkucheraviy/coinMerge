@@ -47,7 +47,21 @@ if(DEPLOYMENT) {
 }
 
 var score=0;
+
 var score_element=document.getElementById('score');
+function updateScore(s){
+    score+=object_scores[s];
+    score_element.innerHTML=score;
+    if(score>window.best_score){
+        window.best_score=score;
+        updategamescore();
+    }
+}
+
+function ressetScore(){
+    score=0;
+    score_element.innerHTML=score;
+}
 
 function updategamescore(){
         fetch('https://coingame.mdprojectth.fun/game/updatescore/'+_uid, {
@@ -60,20 +74,6 @@ function updategamescore(){
 })
 .then(response => response.json())
 .then(response => console.log(JSON.stringify(response)))
-    }
-
-function updateScore(s){
-    score+=object_scores[s];
-    score_element.innerHTML=score;
-    if(score>best_score){
-        updategamescore(score);
-        best_score=score;
-    };
-}
-
-function ressetScore(){
-    score=0;
-    score_element.innerHTML=score;
 }
 
 // height = element.clientHeight;  // height with padding
@@ -99,6 +99,8 @@ var Engine = Matter.Engine,
     Composite = Matter.Composite;
 
 Events = Matter.Events;
+
+Matter.Resolver._restingThresh = 2;
 
 var celling = Bodies.rectangle(0, TOP*2+10 ,2*width, 1, { isStatic: true, isSensor:true, render: {
         fillStyle: 'gray',
@@ -160,41 +162,30 @@ function linkHooks(){
     render.canvas.addEventListener('mouseup', function(event) {
 
         mouseDown = false;
-        let pos=(event.x - POSITION_OFFSET_X)/SCALE;
-        if(pos<object_levels[next_ball.label][0]){
-            pos=object_levels[next_ball.label][0]+1;
-        }else if(pos>width-object_levels[next_ball.label][0]){
-            pos=width-object_levels[next_ball.label][0]-1;
-        }
-
-        // Matter.Body.applyForce( next_ball, {x: next_ball.position.x, y: next_ball.position.y}, {x: 0.0, y: 0.5});
-
-        Matter.Body.set(next_ball, "position", {x: pos, y: 65});
-        // Matter.Body.set(next_ball, "position", {x: event.x, y: 100});
-        // balls.push(next_ball);
-        lastBall=next_ball;
-        next_ball=null;
-        // count+=1;
-        // if(count%2==0){
-        //     counter+=1;
-        // }
-        // if(counter>10) counter=1;
 
         var rnd=Math.random();
-        if(rnd<0.2) counter=1
-        else if(rnd<0.35) counter=2
-        else if(rnd<0.45) counter=3
-        else if(rnd<0.55) counter=4
-        else if(rnd<0.65) counter=5
-        else if(rnd<0.75) counter=6
-        else if(rnd<0.85) counter=7
-        else if(rnd<0.95) counter=8
-        else if(rnd<0.99) counter=9
+        if(rnd<0.4) counter=1
+        else if(rnd<0.60) counter=2
+        else if(rnd<0.75) counter=3
+        else if(rnd<0.85) counter=4
+        else if(rnd<0.90) counter=5
+        else if(rnd<0.95) counter=6
+        else if(rnd<0.98) counter=7
+        else if(rnd<0.99) counter=8
+        else if(rnd<0.995) counter=9
         else counter=10
 
+        Matter.Body.applyForce( next_ball, {x: next_ball.position.x, y: next_ball.position.y}, {x: 0.0, y: 0.4});
+
+        next_ball=null;
+        count+=1;
+        if(count%2==0){
+            counter+=1;
+        }
+        if(counter>10) counter=1;
         setTimeout(function(){
             scaleImage(object_levels['L'+counter][3], object_levels['L'+counter][2], object_levels['L'+counter][2], function(canvas){
-                next_ball=Bodies.circle(pos, TOP, object_levels['L'+counter][0]);
+                next_ball=Bodies.circle(200, TOP, object_levels['L'+counter][0]);
                 next_ball.label="L"+counter;
                 next_ball.restitution=0.4;
                 next_ball.render.sprite.texture=object_levels['L'+counter][4];
@@ -202,11 +193,6 @@ function linkHooks(){
             });
         }, 500);
 
-
-
-        // next_ball=Bodies.circle(400, 100, 10);
-        // next_ball.label="L1";
-        // Composite.add(engine.world, next_ball);
     });
 
     render.canvas.addEventListener('mousemove', function(event) {
@@ -234,22 +220,18 @@ function linkHooks(){
 
     }, false);
     render.canvas.addEventListener("touchend", function (e) {
-        // var touch = e.touches[0];
-        // var x = next_ball.x;
-        // // var y = touch.clientY;
-        //
-        // mouseDown = false;
-        // alert(x);
+        var rnd=Math.random();
+        if(rnd<0.4) counter=1
+        else if(rnd<0.60) counter=2
+        else if(rnd<0.75) counter=3
+        else if(rnd<0.85) counter=4
+        else if(rnd<0.90) counter=5
+        else if(rnd<0.95) counter=6
+        else if(rnd<0.98) counter=7
+        else if(rnd<0.99) counter=8
+        else if(rnd<0.995) counter=9
+        else counter=10
 
-        // if(pos<object_levels[next_ball.label][0]){
-        //         pos=object_levels[next_ball.label][0]+1;
-        // }else if(pos>width-object_levels[next_ball.label][0]){
-        //     pos=width-object_levels[next_ball.label][0]-1;
-        // }
-        // Matter.Body.set(next_ball, "position", {x: pos, y: 100});
-
-        // Matter.Body.set(next_ball, "position", {x: event.x, y: 100});
-        // balls.push(next_ball);
         Matter.Body.applyForce( next_ball, {x: next_ball.position.x, y: next_ball.position.y}, {x: 0.0, y: 0.4});
 
         next_ball=null;
@@ -267,6 +249,7 @@ function linkHooks(){
                 Composite.add(engine.world, next_ball);
             });
         }, 500);
+
 
     }, false);
     render.canvas.addEventListener("touchmove", function (e) {
@@ -302,6 +285,99 @@ function linkHooks(){
         }
     });
 
+
+    Events.on(engine, 'afterUpdate', function (event){
+        // if(me) return
+        // me=true;
+        var removed=[];
+        for(var i=0; i<wait_list.length;i++){
+            console.log("***", wait_list[i].length)
+            if(removed.includes(wait_list[i][0]) || removed.includes(wait_list[i][1])){
+                console.log("pass");
+                continue
+            }
+            var x =wait_list[i][0].position.x;
+            var y =wait_list[i][0].position.y;
+            var nl = object_levels[wait_list[i][1].label];
+            updateScore(wait_list[i][0].label);
+            // removed.push(event.bodyA);
+            // removed.push(event.bodyB);
+            Matter.Composite.remove(engine.world, wait_list[i][0]);
+            Matter.Composite.remove(engine.world, wait_list[i][1]);
+            removed.push(wait_list[i][0]);
+            removed.push(wait_list[i][1]);
+                    // alert(object_levels[nl[1]].length);
+            if (nl[1] != '') {
+                console.log("Removing");
+                var nw = Bodies.circle(x, y, nl[2]);
+                nw.restitution = 0.4;
+                if (object_levels[nl[1]].length < 5) {
+                    // scaleImage(nl[3], nl[1], nl[1], function (canvas) {
+                    //     // Append the canvas element to the li.
+                    //     // liElm.appendChild(canvas);
+                    //     // alert("done")
+                    //     object_levels[nl[1]].push(canvas);
+                    //     nw.render.sprite.texture=object_levels[nl[1]][4];
+                    // });
+                } else {
+                    nw.render.sprite.texture = object_levels[nl[1]][4];
+                }
+                nw.render.sprite.xScale = 1;
+                nw.render.sprite.yScale = 1;
+                nw.label = nl[1];
+                Composite.add(engine.world, nw);
+            }
+
+            console.log("removed", wait_list.length);
+            break
+        }
+        wait_list=[];
+    });
+
+    var me=false;
+    var wait_list=[]
+    Events.on(engine, "circles", function (event){
+            console.log(">>>",event.bodyA.id, event.bodyB.id);
+            console.log(">>>",event.bodyA.position.x, event.bodyA.position.y, event.bodyA.circleRadius)
+            distSq=(event.bodyA.position.x-event.bodyB.position.x)*(event.bodyA.position.x-event.bodyB.position.x)+(event.bodyA.position.y-event.bodyB.position.y)*(event.bodyA.position.y-event.bodyB.position.y)
+            radSumSq=(event.bodyA.circleRadius+event.bodyB.circleRadius)*(event.bodyA.circleRadius+event.bodyB.circleRadius)
+            if(distSq<=radSumSq) {
+                wait_list.push([event.bodyA, event.bodyB]);
+            }
+        //     if(me) return;
+        // //me=true;
+        //     var x = event.bodyA.position.x;
+        //     var y =event.bodyA.position.y;
+        //     var nl = object_levels[event.bodyB.label];
+        //     updateScore(event.bodyA.label);
+        //     // removed.push(event.bodyA);
+        //     // removed.push(event.bodyB);
+        //     Matter.Composite.remove(engine.world, event.bodyA);
+        //     Matter.Composite.remove(engine.world, event.bodyB);
+        //             // alert(object_levels[nl[1]].length);
+        //     if (nl[1] != '') {
+        //         console.log("Removing");
+        //         var nw = Bodies.circle(x, y, nl[2]);
+        //         nw.restitution = 0.4;
+        //         if (object_levels[nl[1]].length < 5) {
+        //             // scaleImage(nl[3], nl[1], nl[1], function (canvas) {
+        //             //     // Append the canvas element to the li.
+        //             //     // liElm.appendChild(canvas);
+        //             //     // alert("done")
+        //             //     object_levels[nl[1]].push(canvas);
+        //             //     nw.render.sprite.texture=object_levels[nl[1]][4];
+        //             // });
+        //         } else {
+        //             nw.render.sprite.texture = object_levels[nl[1]][4];
+        //         }
+        //         nw.render.sprite.xScale = 1;
+        //         nw.render.sprite.yScale = 1;
+        //         nw.label = nl[1];
+        //         Composite.add(engine.world, nw);
+        //     }
+
+    });
+
     Events.on(engine, 'collisionActive', function(event) {
         // console.log("Evento: ", event)
         var pairs = event.pairs;
@@ -309,7 +385,7 @@ function linkHooks(){
         // console.log("Pair visible: ", pairs[0]);
         var removed = [];
         for (var i = 0; i < pairs.length; i++) {
-            // console.log("colision between " + pairs[i].bodyA.label + " - " + pairs[i].bodyB.label);
+            // console.log("ca>>> colision between " + pairs[i].bodyA.label + " - " + pairs[i].bodyB.label);
             if (pairs[i].bodyA.label == 'celling' || pairs[i].bodyB.label == 'ceeling') {
                 var o = pairs[i].bodyA.label == 'celling' ? pairs[i].bodyB : pairs[i].bodyA;
                 if (Math.abs(o.velocity.x) < 0.001 & Math.abs(o.velocity.y) < 0.001) {
@@ -319,51 +395,57 @@ function linkHooks(){
         }
     });
 
+    //TODO: ACTIVATE
+    var CollisionActive=false;
+    if(CollisionActive) {
+        Events.on(engine, 'collisionStart', function (event) {
+            console.log("Evento: ", event)
+            var pairs = event.pairs;
+            // console.log("Pair no visible: ", pairs.length)
+            // console.log("Pair visible: ", pairs[0]);
+            var removed = [];
+            for (var i = 0; i < 1; i++) {
+                // console.log("colision between " + pairs[i].bodyA.label + " - " + pairs[i].bodyB.label);
+                if (pairs[i].bodyA.label == pairs[i].bodyB.label && pairs[i].bodyA.label != '') {
+                    if (pairs[i].bodyA)
+                        var x = pairs[i].bodyA.position.x;
+                    var y = pairs[i].bodyA.position.y;
+                    var nl = object_levels[pairs[i].bodyB.label];
+                    updateScore(pairs[i].bodyA.label);
+                    removed.push(pairs[i].bodyA);
+                    removed.push(pairs[i].bodyB);
+                    Matter.Composite.remove(engine.world, pairs[i].bodyA);
+                    Matter.Composite.remove(engine.world, pairs[i].bodyB);
+                    // alert(object_levels[nl[1]].length);
+                    if (nl[1] != '') {
+                        console.log("Removing");
+                        var nw = Bodies.circle(x, y, nl[2]);
+                        nw.restitution = 0.4;
+                        if (object_levels[nl[1]].length < 5) {
+                            // scaleImage(nl[3], nl[1], nl[1], function (canvas) {
+                            //     // Append the canvas element to the li.
+                            //     // liElm.appendChild(canvas);
+                            //     // alert("done")
+                            //     object_levels[nl[1]].push(canvas);
+                            //     nw.render.sprite.texture=object_levels[nl[1]][4];
+                            // });
+                        } else {
+                            nw.render.sprite.texture = object_levels[nl[1]][4];
+                        }
 
-    Events.on(engine, 'collisionStart', function(event) {
-        // console.log("Evento: ", event)
-        var pairs = event.pairs;
-        // console.log("Pair no visible: ", pairs.length)
-        // console.log("Pair visible: ", pairs[0]);
-        var removed=[];
-        for(var i=0; i<pairs.length; i++){
-            // console.log("colision between " + pairs[i].bodyA.label + " - " + pairs[i].bodyB.label);
-            if(pairs[i].bodyA.label==pairs[i].bodyB.label && pairs[i].bodyA.label!=''){
-                if(pairs[i].bodyA )
-                    var x=pairs[i].bodyA.position.x;
-                var y=pairs[i].bodyA.position.y;
-                var nl=object_levels[pairs[i].bodyB.label];
-                updateScore(pairs[i].bodyA.label);
-                removed.push(pairs[i].bodyA);
-                removed.push(pairs[i].bodyB);
-                Matter.Composite.remove(engine.world, pairs[i].bodyA);
-                Matter.Composite.remove(engine.world, pairs[i].bodyB);
-                // alert(object_levels[nl[1]].length);
-                if(nl[1]!='') {
-                    console.log("Removing");
-                    var nw = Bodies.circle(x, y, nl[2]);
-                    nw.restitution=0.4;
-                    if (object_levels[nl[1]].length < 5) {
-                        // scaleImage(nl[3], nl[1], nl[1], function (canvas) {
-                        //     // Append the canvas element to the li.
-                        //     // liElm.appendChild(canvas);
-                        //     // alert("done")
-                        //     object_levels[nl[1]].push(canvas);
-                        //     nw.render.sprite.texture=object_levels[nl[1]][4];
-                        // });
-                    } else {
-                        nw.render.sprite.texture = object_levels[nl[1]][4];
+                        nw.render.sprite.xScale = 1;
+                        nw.render.sprite.yScale = 1;
+                        nw.label = nl[1];
+                        Composite.add(engine.world, nw);
                     }
-
-                    nw.render.sprite.xScale = 1;
-                    nw.render.sprite.yScale = 1;
-                    nw.label = nl[1];
-                    Composite.add(engine.world, nw);
                 }
             }
-        }
+        });
+    }
 
-    });
+//     Events.on(engine, 'collisionStart collisionActive collisionEnd', function (event) {
+//     console.log(event.pairs);
+//     });
 
     // Events.on(engine, 'collisionActive', function(event) {
     //     // console.log("Evento: ", event)
@@ -494,9 +576,16 @@ function loadImageRec(i){
     });
 }
 
+
+
 function stopGame(){
     next_ball=null;
     document.getElementById('gameover').style.visibility='visible';
+    document.getElementById('current_score_value').innerHTML=score;
+    if(score>window.best_score){
+        window.best_score=score;
+        updategamescore();
+    }
     Matter.World.clear(engine.world);
     Engine.clear(engine);
     Render.stop(render);
@@ -540,14 +629,64 @@ function startGame(){
     resize();
     linkHooks();
     addBody();
-
+    document.getElementById('dashboard').style.visibility='hidden';
+    document.getElementById('dashboard').style.display='none';
     document.getElementById('gameover').style.visibility='hidden';
+    // let bs=[];
+    // for(var i=0; i<3;i++) {
+    //     next_ball=Bodies.circle((2*object_levels['L1'][0]+0)*(i+1), height-object_levels['L1'][0], object_levels['L1'][0]);
+    //     next_ball.label="L1";
+    //     bs.push(next_ball);
+    //     scaleImage(object_levels['L1'][3], object_levels['L1'][0]*2, object_levels['L1'][0]*2, function(canvas){
+    //         // Append the canvas element to the li.
+    //         // liElm.appendChild(canvas);
+    //         // alert("done")
+    //         object_levels['L1'].push(canvas.toDataURL());
+    //         next_ball.label="L1";
+    //         next_ball.restitution=0.4;
+    //         next_ball.render.sprite.texture=object_levels['L1'][4];
+    //         next_ball.render.sprite.xScale=1;
+    //         next_ball.render.sprite.yScale=1;
+    //     });
+    //
+    //     Composite.add(engine.world, next_ball);
+    //     if(i>0){
+    //         console.log("<<>>", i, i-1, Matter.Detector.canCollide(bs[i-1], bs[i]));
+    //         console.log("<<>>", i, i-1, Matter.Collision.collides(bs[i-1], bs[i]));
+    //     }
+    //
+    // }
+
     ressetScore();
+}
+
+function getLeadBoard(){
+    let url = 'https://coingame.mdprojectth.fun/game/buddy/'+window._uid;
+
+    fetch(url)
+    .then(res => res.json())
+    .then(out =>{
+        buddies=document.getElementById('game_buddies_list');
+        buddies.innerHTML="";
+        var count = Object.keys(out).length;
+        console.log('Checkout this JSON! ', count)
+        for(var i=0; i<count; i++){
+            buddies.innerHTML+="<div class=\"buddy\">\n" +
+                "          <div class=\"buddy_logo\">\n" +
+                "            <img src=\""+"data:image/png;base64,"+out[i+1][2]+"\">\n" +
+                "          </div>\n" +
+                "              <div class=\"buddy_score\">"+out[i+1][1]+"</div>\n" +
+                "          <div class=\"buddy_score\">"+out[i+1][0].toString()+"</div>\n" +
+                "        </div>";
+        }
+    })
+    .catch(err => { throw err });
 }
 
 function addBody(){
     gravity=engine.world.gravity;
-    next_ball=Bodies.circle(width/2, TOP, object_levels['L1'][0]);
+    next_ball = Bodies.circle(width / 2, TOP, object_levels['L1'][0]);
+    // next_ball=Bodies.circle(width/2, currentHeight-100, object_levels['L1'][0]);
     Composite.add(engine.world, next_ball);
     scaleImage(object_levels['L1'][3], object_levels['L1'][0]*2, object_levels['L1'][0]*2, function(canvas){
         // Append the canvas element to the li.
@@ -563,8 +702,6 @@ function addBody(){
 
 
     loadImageRec(2);
-
-    updateScore()
 
 
     // var circle=Bodies.circle(400, 200, 40);

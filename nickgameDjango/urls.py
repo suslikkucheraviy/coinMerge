@@ -21,7 +21,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('game', views.game),
     path('game/<uuid:userid>', views.gameuser),
+    path('game/buddy/<uuid:userid>', views.buddy),
     path('game/updatescore/<uuid:userid>', views.gamescore),
-    path('<str:extra>', views.telegram_view)
+    path('<str:extra>', views.telegram_viewb)
 
 ]

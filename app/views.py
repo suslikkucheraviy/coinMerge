@@ -18,20 +18,62 @@ def game(request):
 def gameuser(request, userid):
     user=GameUsers.objects.get(record_id=userid)
     if(user.score is None):
+        print("score is null")
         user.score=0
         user.save()
+    print(user.score)
     return render(request, 'indexMatter.html', {'userid':userid, 'bestScore': user.score})
+
+
+import base64
+import requests
+def buddy(request, userid):
+    if (request.method == 'GET'):
+        user=GameUsers.objects.get(record_id=userid)
+        if(user.is_message):
+            res = bot.getGameHighScores(user_id=user.id, message_id=user.message_id)
+        else:
+            res=bot.getGameHighScores(user_id=user.id, inline_message_id=user.message_id)
+        resp={}
+        for u in res:
+            print(u)
+            print(u.user)
+            profpic=bot.getUserProfilePhotos(u.user.id, limit=1)
+            img_path='https://coingame.mdprojectth.fun/static/assets/10bitcoin.png'
+            if(profpic['total_count']>0):
+                # print()
+                img = bot.getFile(profpic['photos'][0][0]['file_id'])
+                print(img)
+                img_path=img['file_path']
+                img_data = requests.get(img_path).content
+                img_data  = base64.b64encode(img_data)
+            else:
+                img_data = requests.get(img_path).content
+                img_data = base64.b64encode(img_data)
+                print(img_data)
+                # with open(img_path, "rb") as image:
+                #     img_data = base64.b64encode(image.read())
+
+            resp[u.position]=[u.score, u.user.first_name, str(img_data)[2:-1]]
+        print(resp)
+    return HttpResponse(json.dumps(resp), status=200)
 
 @csrf_exempt
 def gamescore(request, userid):
     if (request.method == 'POST'):
         print("Updating Score")
-        # user=GameUsers.objects.get(record_id=userid)
-        # # bot.setGameScore(user.id, 100)
-        # data=json.loads(request.body)
+        user=GameUsers.objects.get(record_id=userid)
+        data = json.loads(request.body)
+        print(user.message_id)
+        if(user.is_message):
+            bot.setGameScore(user.id, data['score'], message_id=user.message_id)
+        else:
+            bot.setGameScore(user.id, data['score'], inline_message_id=user.message_id)
+
         # bot.setGameScore(user_id=user.id, score=data['score'], message_id=user.message_id, chat_id=user.id)
-        # user.score=data['score']
-        # user.save()
+        user.score=data['score']
+        user.save()
+        print("saved")
         return HttpResponse(status=200)
 
 
@@ -41,8 +83,7 @@ def telegram_view(request, extra):
         if (extra == SETTINGS.TOKEN):
             json_data = json.loads(request.body)
             update = telegram.Update.de_json(json_data, bot)
-            # print(update)
-            #
+            print(update)
             if (update.callback_query is not None):
                 # print("PLAY BUTTON?")
                 # print(update.callback_query.id)
@@ -69,11 +110,8 @@ def telegram_viewb(request, extra):
             print(update)
             #
             if (update.callback_query is not None):
-                print("PLAY BUTTON?")
-                print(update.callback_query.id)
-                print(update.callback_query.from_user)
                 try:
-                    user=GameUsers.objects.get(username=update.callback_query.from_user.username)
+                    user=GameUsers.objects.get(id=update.callback_query.from_user.id)
                 except Exception as e:
                     username=update.callback_query.from_user.username
                     u_id=update.callback_query.from_user.id
@@ -84,14 +122,22 @@ def telegram_viewb(request, extra):
 
                     user=GameUsers(id=u_id, username=username, first_name=first_name, last_name=last_name, is_bot=is_bot, language_code=language_code)
                     user.save()
-                    print("added")
                 try:
-                    user.message_id=str(update.callback_query.message.message_id)
-                    user.save()
+                    if(update.callback_query.message is not None):
+                        user.message_id = str(update.callback_query.message.message_id)
+                        user.is_message=True
+                        user.save()
+                    else:
+                        user.message_id=str(update.callback_query.inline_message_id)
+                        user.is_message = False
+                        user.save()
                 except Exception as e:
-                    print(update.callback_query.message.message_id)
+                    print("Here")
+                    # print(update.callback_query.message.inline_message_id)
                     print(str(e))
+                print(SETTINGS.GAME_URL+'/'+str(user.record_id))
                 bot.answerCallbackQuery(update.callback_query.id, url=SETTINGS.GAME_URL+'/'+str(user.record_id))
+                # bot.answerCallbackQuery(update.callback_query.id, url=SETTINGS.GAME_URL)
             else:
                 print("Hello")
                 print(json_data)
