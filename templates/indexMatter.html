@@ -22,8 +22,8 @@
     }
 
     canvas {
-      border:1px solid #d3d3d3;
-      background-color: #f1f1f1;
+      /*border:1px solid #d3d3d3;*/
+      background-color: transparent;
       display: block;
       margin: 0 auto;
     }
@@ -33,25 +33,31 @@
       height: 100%;
       position: fixed;
       /*background-color: #d3d3d3;*/
+        background-image: url("/static/assets/back.jpg");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
       padding: 0px;
       margin: 0px;
       overflow: hidden;
+        color: white;
     }
 
     #dashboard{
       position: relative;
       height: 100%;
       width: 100%;
-      background-color: white;
+      background-color: transparent;
     }
 
     #score {
       position: fixed;
       top: 5%;
-      left: 5%;
+      left: 8%;
       font-family: GameFont;
       font-weight: bolder;
       font-size: 28pt;
+        display: none;
     }
 
     #game_title{
@@ -79,7 +85,7 @@
       width: 100%;
       top: 50%;
       left: 50%;
-      background-color: rgba(255,255,255,0.8);
+      /*background-color: rgba(255,255,255,0.8);*/
       transform: translate(-50%, -50%);
 
     }
@@ -197,6 +203,34 @@
       opacity: 1;
     }
 
+    #pause{
+        position: absolute;
+        right: 8%;
+        top: calc(5% + 14px);
+        border: 0;
+        background: transparent;
+        box-sizing: border-box;
+        width: 0;
+        height: 30px;
+
+        display: none;
+
+        border-color: transparent transparent transparent white;
+        transition: 100ms all ease;
+        cursor: pointer;
+
+        // play state
+        border-style: solid;
+            /*border-width: 37px 0 37px 60px;*/
+
+
+             border-style: double;
+             border-width: 0px 0 0px 30px;
+
+
+
+    }
+
     .current_score_label{
       font-family: GameFont;
       font-size: 18pt;
@@ -236,6 +270,7 @@
     window._uid= "{{ userid }}";
 </script>
 <div id="score">0</div>
+
 <div id="dashboard">
   <div id="startgame">
       <div id="game_title">Coin Merge</div>
@@ -258,10 +293,14 @@
   <span class="best_score_label">Your best score</span>
   <span id="best_score_value">100</span>
   <div class="share" onclick="TelegramGameProxy.shareScore()">Share with friends</div>
-  <div class="play-button-outer" onclick="startGame()">
+  <div id="continue" class="share" onclick="pause()">Resume</div>
+
+    <div class="play-button-outer" onclick="startGame()">
         <div class="play-button"></div>
   </div>
 </div>
+
+<div id="pause" class="pause" onclick="pause()"></div>
 <script src="/static/js/game.js"></script>
 </body>
 </html>

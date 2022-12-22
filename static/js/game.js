@@ -21,29 +21,31 @@ POSITION_OFFSET_X=0;
 POSITION_OFFSET_Y=0;
 TOP=75;
 
+var is_paused=false;
+
 if(DEPLOYMENT) {
 
-    object_levels['L1'] = [25, 'L2', 30, '/static/assets/1dogecoin.png',];
-    object_levels['L2'] = [30, 'L3', 35, '/static/assets/2Solana.png'];
-    object_levels['L3'] = [35, 'L4', 40, '/static/assets/3ADA.png'];
-    object_levels['L4'] = [40, 'L5', 45, '/static/assets/4busd.png'];
-    object_levels['L5'] = [45, 'L6', 50, '/static/assets/5XRP.png'];
-    object_levels['L6'] = [50, 'L7', 55, '/static/assets/6bnb.png'];
-    object_levels['L7'] = [55, 'L8', 60, '/static/assets/7usdc.png'];
-    object_levels['L8'] = [60, 'L9', 65, '/static/assets/8ether.png'];
-    object_levels['L9'] = [65, 'L10', 70, '/static/assets/9ethereum.png'];
-    object_levels['L10'] = [70, '', 75, '/static/assets/10bitcoin.png'];
+    object_levels['L1'] = [25, 'L2', 30, '/static/assets/10.png',];
+    object_levels['L2'] = [30, 'L3', 35, '/static/assets/9.png'];
+    object_levels['L3'] = [35, 'L4', 40, '/static/assets/8.png'];
+    object_levels['L4'] = [40, 'L5', 45, '/static/assets/7.png'];
+    object_levels['L5'] = [45, 'L6', 50, '/static/assets/6.png'];
+    object_levels['L6'] = [50, 'L7', 55, '/static/assets/5.png'];
+    object_levels['L7'] = [55, 'L8', 60, '/static/assets/4.png'];
+    object_levels['L8'] = [60, 'L9', 65, '/static/assets/3.png'];
+    object_levels['L9'] = [65, 'L10', 70, '/static/assets/2.png'];
+    object_levels['L10'] = [70, '', 75, '/static/assets/1.png'];
 }else{
-    object_levels['L1'] = [25, 'L2', 30, '../static/assets/1dogecoin.png',];
-    object_levels['L2'] = [30, 'L3', 35, '../static/assets/2Solana.png'];
-    object_levels['L3'] = [35, 'L4', 40, '../static/assets/3ADA.png'];
-    object_levels['L4'] = [40, 'L5', 45, '../static/assets/4busd.png'];
-    object_levels['L5'] = [45, 'L6', 50, '../static/assets/5XRP.png'];
-    object_levels['L6'] = [50, 'L7', 55, '../static/assets/6bnb.png'];
-    object_levels['L7'] = [55, 'L8', 60, '../static/assets/7usdc.png'];
-    object_levels['L8'] = [60, 'L9', 65, '../static/assets/8ether.png'];
-    object_levels['L9'] = [65, 'L10', 70, '../static/assets/9ethereum.png'];
-    object_levels['L10'] = [70, '', 75, '../static/assets/10bitcoin.png'];
+    object_levels['L1'] = [25, 'L2', 30, '../static/assets/10.png',];
+    object_levels['L2'] = [30, 'L3', 35, '../static/assets/9.png'];
+    object_levels['L3'] = [35, 'L4', 40, '../static/assets/8.png'];
+    object_levels['L4'] = [40, 'L5', 45, '../static/assets/7.png'];
+    object_levels['L5'] = [45, 'L6', 50, '../static/assets/6.png'];
+    object_levels['L6'] = [50, 'L7', 55, '../static/assets/5.png'];
+    object_levels['L7'] = [55, 'L8', 60, '../static/assets/4.png'];
+    object_levels['L8'] = [60, 'L9', 65, '../static/assets/3.png'];
+    object_levels['L9'] = [65, 'L10', 70, '../static/assets/2.png'];
+    object_levels['L10'] = [70, '', 75, '../static/assets/1.png'];
 }
 
 var score=0;
@@ -110,9 +112,23 @@ var celling = Bodies.rectangle(0, TOP*2+10 ,2*width, 1, { isStatic: true, isSens
     } });
 
 celling.label="celling";
-var ground = Bodies.rectangle(0, height+50 ,2*width, 100, { isStatic: true });
-var left = Bodies.rectangle(-25, 10, 50, height*2, { isStatic: true });
-var right = Bodies.rectangle(width+25, 0, 50, 2*height, { isStatic: true });
+var ground = Bodies.rectangle(1, height ,2*width+1, 100, {
+    isStatic: true,
+    render: {
+        fillStyle: "transparent",
+        lineWidth: 3
+    }
+});
+var left = Bodies.rectangle(-25, 10, 50, height*2, {
+    isStatic: true,
+    render: {
+        opacity: 0.0,
+    }});
+var right = Bodies.rectangle(width+25, 0, 50, 2*height, {
+    isStatic: true,
+    render: {
+        opacity: 0.0,
+    }});
 
 var engine=null;
 var render=null;
@@ -152,15 +168,13 @@ function initializeWorld(){
 
 }
 
-
-
 function linkHooks(){
     render.canvas.addEventListener('mousedown',function(event) {
         mouseDown = true;
     });
 
     render.canvas.addEventListener('mouseup', function(event) {
-
+        if(is_paused) return;
         mouseDown = false;
 
         var rnd=Math.random();
@@ -175,7 +189,7 @@ function linkHooks(){
         else if(rnd<0.995) counter=9
         else counter=10
 
-        Matter.Body.applyForce( next_ball, {x: next_ball.position.x, y: next_ball.position.y}, {x: 0.0, y: 0.4});
+        Matter.Body.applyForce( next_ball, {x: next_ball.position.x, y: next_ball.position.y}, {x: 0.0, y: 0.0});
 
         next_ball=null;
         count+=1;
@@ -187,7 +201,7 @@ function linkHooks(){
             scaleImage(object_levels['L'+counter][3], object_levels['L'+counter][2], object_levels['L'+counter][2], function(canvas){
                 next_ball=Bodies.circle(200, TOP, object_levels['L'+counter][0]);
                 next_ball.label="L"+counter;
-                next_ball.restitution=0.4;
+                next_ball.restitution=0.1;
                 next_ball.render.sprite.texture=object_levels['L'+counter][4];
                 Composite.add(engine.world, next_ball);
             });
@@ -196,6 +210,7 @@ function linkHooks(){
     });
 
     render.canvas.addEventListener('mousemove', function(event) {
+        if(is_paused) return;
         if(mouseDown){
             // let pos=event.x;
             // console.log(event.x, (event.x - POSITION_OFFSET_X)/SCALE)
@@ -212,6 +227,7 @@ function linkHooks(){
     });
 
     render.canvas.addEventListener("touchstart", function (e) {
+        if(is_paused) return;
         mousePos = getTouchPos(canvas, e);
         var x= touch.clientX;
         var y= touch.clientY;
@@ -220,6 +236,7 @@ function linkHooks(){
 
     }, false);
     render.canvas.addEventListener("touchend", function (e) {
+        if(is_paused) return;
         var rnd=Math.random();
         if(rnd<0.4) counter=1
         else if(rnd<0.60) counter=2
@@ -232,7 +249,7 @@ function linkHooks(){
         else if(rnd<0.995) counter=9
         else counter=10
 
-        Matter.Body.applyForce( next_ball, {x: next_ball.position.x, y: next_ball.position.y}, {x: 0.0, y: 0.4});
+        Matter.Body.applyForce( next_ball, {x: next_ball.position.x, y: next_ball.position.y}, {x: 0.0, y: 0.0});
 
         next_ball=null;
         count+=1;
@@ -244,7 +261,7 @@ function linkHooks(){
             scaleImage(object_levels['L'+counter][3], object_levels['L'+counter][2], object_levels['L'+counter][2], function(canvas){
                 next_ball=Bodies.circle(200, TOP, object_levels['L'+counter][0]);
                 next_ball.label="L"+counter;
-                next_ball.restitution=0.4;
+                next_ball.restitution=0.1;
                 next_ball.render.sprite.texture=object_levels['L'+counter][4];
                 Composite.add(engine.world, next_ball);
             });
@@ -253,6 +270,7 @@ function linkHooks(){
 
     }, false);
     render.canvas.addEventListener("touchmove", function (e) {
+        if(is_paused) return;
         var touch = e.touches[0];
         mouseDown=true;
 
@@ -507,16 +525,19 @@ var next_ball=null;
 
 
 document.body.addEventListener("touchstart", function (e) {
+    if(is_paused) return;
     if (e.target == canvas) {
         e.preventDefault();
     }
 }, false);
 document.body.addEventListener("touchend", function (e) {
+    if(is_paused) return;
     if (e.target == canvas) {
         e.preventDefault();
     }
 }, false);
 document.body.addEventListener("touchmove", function (e) {
+    if(is_paused) return;
     if (e.target == canvas) {
         e.preventDefault();
     }
@@ -581,6 +602,14 @@ function loadImageRec(i){
 function stopGame(){
     next_ball=null;
     document.getElementById('gameover').style.visibility='visible';
+    if(is_paused)
+        document.getElementById('continue').style.display='block';
+    else
+        document.getElementById('continue').style.display='none';
+
+    document.getElementById("score").style.display="none";
+    document.getElementById("pause").style.display="none";
+
     document.getElementById('current_score_value').innerHTML=score;
     if(score>window.best_score){
         window.best_score=score;
@@ -597,6 +626,26 @@ function stopGame(){
 }
 // initializeWorld();
 // linkHooks();
+function pause(){
+    // alert("Pause");
+    is_paused=runner.enabled;
+    runner.enabled=!is_paused;
+
+    if(is_paused){
+        render.canvas.style.display="none";
+        document.getElementById("score").style.display="none";
+        document.getElementById("pause").style.display="none";
+        document.getElementById('continue').style.display='block';
+        document.getElementById('gameover').style.visibility='visible';
+        document.getElementById('current_score_value').innerHTML=score;
+    }else{
+        document.getElementById('gameover').style.visibility='hidden';
+        document.getElementById('continue').style.display='none';
+        document.getElementById("score").style.display="block";
+        document.getElementById("pause").style.display="block";
+        render.canvas.style.display="block";
+    }
+}
 
 function resize(){
     currentHeight = window.innerHeight;
@@ -611,6 +660,7 @@ function resize(){
     // we're essentially scaling it with CSS
     canvas.style.width = currentWidth + 'px';
     canvas.style.height = currentHeight + 'px';
+    canvas.style.background="transparent"
 
 
 
@@ -625,6 +675,22 @@ function resize(){
     }, 1);
 }
 function startGame(){
+    if(is_paused){
+        Matter.World.clear(engine.world);
+        Engine.clear(engine);
+        Render.stop(render);
+        Runner.stop(runner);
+        render.canvas.remove();
+        render.canvas = null;
+        render.context = null;
+        render.textures = {};
+    }
+    is_paused=false;
+
+    document.getElementById("score").style.display="block";
+    document.getElementById("pause").style.display="block";
+
+    // alert("Start");
     initializeWorld();
     resize();
     linkHooks();
@@ -694,7 +760,7 @@ function addBody(){
         // alert("done")
         object_levels['L1'].push(canvas.toDataURL());
         next_ball.label="L1";
-        next_ball.restitution=0.4;
+        next_ball.restitution=0.1;
         next_ball.render.sprite.texture=object_levels['L1'][4];
         next_ball.render.sprite.xScale=1;
         next_ball.render.sprite.yScale=1;
