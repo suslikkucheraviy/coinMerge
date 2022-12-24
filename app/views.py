@@ -11,6 +11,10 @@ from app.models import *
 
 bot = telegram.Bot(token=SETTINGS.TOKEN)
 
+def admin(request):
+    users=GameUsers.objects.all()
+
+    return render(request, "admin.html", {"users": users})
 
 def game(request):
     return render(request, 'indexMatter.html')
@@ -56,6 +60,42 @@ def buddy(request, userid):
 
             resp[u.position]=[u.score, u.user.first_name, str(img_data)[2:-1]]
         print(resp)
+    return HttpResponse(json.dumps(resp), status=200)
+
+
+def liders(request, userid):
+    if (request.method == 'GET'):
+
+        #Get Top 10 User Socres
+        top_10_users=GameUsers.objects.all().order_by('-score')[:10]
+        # user=GameUsers.objects.get(record_id=userid)
+        # if(user.is_message):
+        #     res = bot.getGameHighScores(user_id=user.id, message_id=user.message_id)
+        # else:
+        #     res=bot.getGameHighScores(user_id=user.id, inline_message_id=user.message_id)
+        resp={}
+        position=0
+        if(True):
+            for u in top_10_users:
+                position+=1
+                profpic=bot.getUserProfilePhotos(u.id, limit=1)
+                img_path='https://coingame.mdprojectth.fun/static/assets/10bitcoin.png'
+                if(profpic['total_count']>0):
+                    # print()
+                    img = bot.getFile(profpic['photos'][0][0]['file_id'])
+                    print(img)
+                    img_path=img['file_path']
+                    img_data = requests.get(img_path).content
+                    img_data  = base64.b64encode(img_data)
+                else:
+                    img_data = requests.get(img_path).content
+                    img_data = base64.b64encode(img_data)
+                    print(img_data)
+                    # with open(img_path, "rb") as image:
+                    #     img_data = base64.b64encode(image.read())
+
+                resp[position]=[u.score, u.username, str(img_data)[2:-1]]
+            print(position)
     return HttpResponse(json.dumps(resp), status=200)
 
 @csrf_exempt

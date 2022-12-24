@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+</head>
+<style>
+table{
+    width: 100%;
+}
+
+table th{
+    text-align: left;
+}
+
+</style>
+<body>
+<table>
+<tr>
+  <th colspan="1">Username</th>
+  <th colspan="1">Name</th>
+  <th colspan="1">Surname</th>
+  <th colspan="1">Score</th>
+</tr>
+{% for x in users %}
+<tr>
+  <td>{{ x.username }}</td>
+  <td>{{ x.first_name }}</td>
+  <td>{{ x.last_name }}</td>
+  <td>{{ x.score }}</td>
+{% endfor %}
+</table>
+</body>
+</html>

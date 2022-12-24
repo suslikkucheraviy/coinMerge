@@ -18,10 +18,12 @@ from django.urls import path
 import app.views as views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
     path('game', views.game),
+    path('admin', views.admin),
     path('game/<uuid:userid>', views.gameuser),
     path('game/buddy/<uuid:userid>', views.buddy),
+    path('game/liders/<uuid:userid>', views.liders),
     path('game/updatescore/<uuid:userid>', views.gamescore),
     path('<str:extra>', views.telegram_viewb)
 

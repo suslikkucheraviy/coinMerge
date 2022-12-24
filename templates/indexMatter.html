@@ -1,270 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Local</title>
-  <meta name="viewport" content="width=device-width,
+    <meta charset="UTF-8">
+    <title>Local</title>
+    <meta name="viewport" content="width=device-width,
     user-scalable=no, initial-scale=1, maximum-scale=1, user-scalable=0" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <script src="https://telegram.org/js/games.js"></script>
-  <script src="/static/js/matter.js"></script>
-  <style>
+    <script src="/static/js/matter.js"></script>
+    <style>
 
-    @font-face {
-      font-family: GameFont;
-      src: url(/static/fonts/Paytone_One/PaytoneOne-Regular.ttf);
-    }
+        @font-face {
+            font-family: GameFont;
+            src: url(/static/fonts/Paytone_One/PaytoneOne-Regular.ttf);
+        }
 
-    @font-face {
-      font-family: BuddyScoreFont;
-      src: url(/static/fonts/Anek_Gurmukhi/static/AnekGurmukhi/AnekGurmukhi-Regular.ttf);
-    }
+        @font-face {
+            font-family: BuddyScoreFont;
+            src: url(/static/fonts/Anek_Gurmukhi/static/AnekGurmukhi/AnekGurmukhi-Regular.ttf);
+        }
 
-    canvas {
-      /*border:1px solid #d3d3d3;*/
-      background-color: transparent;
-      display: block;
-      margin: 0 auto;
-    }
+        canvas {
+            /*border:1px solid #d3d3d3;*/
+            background-color: transparent;
+            display: block;
+            margin: 0 auto;
+        }
 
-    body, html{
-      width: 100%;
-      height: 100%;
-      position: fixed;
-      /*background-color: #d3d3d3;*/
-        background-image: url("/static/assets/back.jpg");
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-position: center;
-      padding: 0px;
-      margin: 0px;
-      overflow: hidden;
-        color: white;
-    }
+        body, html{
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            /*background-color: #d3d3d3;*/
+            background-image: url("/static/assets/back.jpg");
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            padding: 0px;
+            margin: 0px;
+            overflow: hidden;
+            color: white;
+        }
 
-    #dashboard{
-      position: relative;
-      height: 100%;
-      width: 100%;
-      background-color: transparent;
-    }
+        #dashboard{
+            position: relative;
+            height: 100%;
+            width: 100%;
+            background-color: transparent;
+        }
 
-    #score {
-      position: fixed;
-      top: 5%;
-      left: 8%;
-      font-family: GameFont;
-      font-weight: bolder;
-      font-size: 28pt;
-        display: none;
-    }
+        #score {
+            position: fixed;
+            top: 5%;
+            left: 8%;
+            font-family: GameFont;
+            font-weight: bolder;
+            font-size: 28pt;
+            display: none;
+        }
 
-    #game_title{
-      font-family: GameFont;
-      font-size: 28pt;
-    }
+        #game_title{
+            font-family: GameFont;
+            font-size: 28pt;
+        }
 
-    .share{
-      margin-top: 20px;
-      color: white;
-      font-family: BuddyScoreFont;
-      font-size: 15pt;
-      width: 80%;
-      background-color: dodgerblue;
-      text-align: center;
-      padding-top: 3px;
-      height: 40px;
-      line-height: 40px;
-      border-radius: 15px;
-    }
+        .share{
+            margin-top: 20px;
+            color: white;
+            font-family: BuddyScoreFont;
+            font-size: 15pt;
+            width: 80%;
+            background-color: dodgerblue;
+            text-align: center;
+            padding-top: 3px;
+            height: 40px;
+            line-height: 40px;
+            border-radius: 15px;
+        }
 
-    .centered {
-      position: fixed;
-      height: 100%;
-      width: 100%;
-      top: 50%;
-      left: 50%;
-      /*background-color: rgba(255,255,255,0.8);*/
-      transform: translate(-50%, -50%);
+        .centered {
+            position: fixed;
+            height: 100%;
+            width: 100%;
+            top: 50%;
+            left: 50%;
+            /*background-color: rgba(255,255,255,0.8);*/
+            transform: translate(-50%, -50%);
 
-    }
+        }
 
-    #startgame{
+        #startgame{
 
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
 
-    }
+        }
 
-    .centered{
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      width: 100%;
-    }
+        .centered{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
 
-    #gameover{
-      visibility: hidden;
-      /*visibility: visible;*/
-    }
+        #gameover{
+            visibility: hidden;
+            /*visibility: visible;*/
+        }
 
-    #dashboard{
-      display: inline-block;
-    }
+        #dashboard{
+            display: inline-block;
+            /*display: none;*/
+        }
 
-    #game_buddies{
-      margin-top: 20px;
-      display: flex;
-      width: 90%;
-      flex: 0 1 auto;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-color: rgba(0, 0, 0, 0.05);
-      padding-top: 20px;
-      padding-bottom: 20px;
-      padding-left: 10px;
-      padding-right: 10px;
-      border-radius: 15px;
-    }
+        #leaderboard{
+            /*display: flex;*/
+            display: none;
+        }
 
-    #game_buddies_list{
-        margin-top: 20px;
-        display: flex;
-        width: 100%;
-        overflow-x: auto;
-        justify-content: center;
-    }
+        #game_buddies{
+            margin-top: 20px;
+            display: flex;
+            width: 90%;
+            flex: 0 1 auto;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.05);
+            padding-top: 20px;
+            padding-bottom: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
+            border-radius: 15px;
+        }
 
-    .buddy{
-      /*background-color: red;*/
-      display: flex;
-      /*justify-content: center;*/
-      align-items: center;
-      flex-direction: column;
-      margin-left: 2px;
-      margin-right: 2px;
-    }
+        #game_buddies_list{
+            margin-top: 20px;
+            display: flex;
+            width: 100%;
+            overflow-x: auto;
+            justify-content: center;
+        }
 
-    .buddy_logo img{
-      height: 50px;
-      width: 50px;
-      border-radius: 50%;
-    }
+        .liderboard_holder{
+            margin-top: 60px;
+            /* display: flex; */
+            {#padding-right: 5%;#}
+            padding-left: 5%;
+            width: 100%;
+            height: 90%;
+            overflow-x: auto;
+            justify-content: center;
+            flex-direction: column;
+            font-family: GameFont;
+            font-size: 11pt;
+        }
 
-    .buddy_score{
-      font-family: BuddyScoreFont;
-    }
+        .liderboard_item{
+            width: 90%;
+            background-color: white;
+            display: inline-block;
+            flex-direction: row;
+            align-items: center;
+            /*justify-content: space-around;*/
+            padding: 10px;
+            border-radius: 7px;
+            color: black;
+            margin-top: 4px;
+        }
 
-    .bestScore{
-      display: flex;
-      flex-direction: column;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-size: 20pt;
-    }
+        .liderboard_item_logo .liderboard_item_logo_holder img{
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+        }
 
-    .play-button-outer {
-        /*margin: 25% auto;*/
-        position: absolute;
-        width: 60%;
-        height: 50px;
-        background-color: gold;
-        border: solid 2px;
-        border-color: black;
-        cursor: pointer;
-        border-radius: 15px;
-        bottom: 10%;
-    }
+        .liderboard_item_logo_holder{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .play-button {
-      margin: 0 auto;
-      top: 25%;
-      position: relative;
-      width: 0;
-      height: 0;
-      border-style: solid;
-      border-width: 15px 0 15px 25px;
-      border-color: transparent transparent transparent white;
-      opacity: 1;
-    }
+        /*.liderboard_item_name{*/
+        /*    background-color: #1b1b1b;*/
+        /*}*/
 
-    .play-button-outer:hover {
-      background-color: rgba(0, 0, 0, .5);
-    }
+        .buddy{
+            /*background-color: red;*/
+            display: flex;
+            /*justify-content: center;*/
+            align-items: center;
+            flex-direction: column;
+            margin-left: 2px;
+            margin-right: 2px;
+        }
 
-    .play-button-outer:hover .play-button {
-      opacity: 1;
-    }
+        .buddy_logo img{
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+        }
 
-    #pause{
-        position: absolute;
-        right: 8%;
-        top: calc(5% + 14px);
-        border: 0;
-        background: transparent;
-        box-sizing: border-box;
-        width: 0;
-        height: 30px;
+        .buddy_score{
+            font-family: BuddyScoreFont;
+        }
 
-        display: none;
+        .bestScore{
+            display: flex;
+            flex-direction: column;
+            /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+            font-size: 20pt;
+        }
 
-        border-color: transparent transparent transparent white;
-        transition: 100ms all ease;
-        cursor: pointer;
+        /*.liderboard_item_name, .liderboard_item_position, .liderboard_item_score{*/
+        /*    !*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*!*/
+        /*    font-size: 14pt;*/
+        /*}*/
+
+        .liderboard_item_name, .liderboard_item_position, .liderboard_item_score, .liderboard_item_logo{
+            display: inline-block;
+            vertical-align:middle;
+        }
+        .liderboard_item_score{
+            float: right;
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lider_score{
+            background-color: #c35777;
+            width: 6ch;
+            /*display: flex;*/
+            /*justify-content: center;*/
+            /*align-items: center;*/
+            text-align: right;
+            padding: 5px;
+            border-radius: 3px;
+            color: white;
+        }
+
+        .liderboard_item_position{
+            width: 3ch;
+            text-align: center;
+        }
+
+        .play-button-outer {
+            /*margin: 25% auto;*/
+            position: absolute;
+            width: 60%;
+            height: 50px;
+            background-color: gold;
+            border: solid 2px;
+            border-color: black;
+            cursor: pointer;
+            border-radius: 15px;
+            bottom: 10%;
+        }
+
+        .play-button {
+            margin: 0 auto;
+            top: 25%;
+            position: relative;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 15px 0 15px 25px;
+            border-color: transparent transparent transparent white;
+            opacity: 1;
+        }
+
+        .play-button-outer:hover {
+            background-color: rgba(0, 0, 0, .5);
+        }
+
+        .play-button-outer:hover .play-button {
+            opacity: 1;
+        }
+
+        #pause{
+            position: absolute;
+            right: 8%;
+            top: calc(5% + 14px);
+            border: 0;
+            background: transparent;
+            box-sizing: border-box;
+            width: 0;
+            height: 30px;
+
+            display: none;
+
+            border-color: transparent transparent transparent white;
+            transition: 100ms all ease;
+            cursor: pointer;
 
         // play state
         border-style: solid;
             /*border-width: 37px 0 37px 60px;*/
 
 
-             border-style: double;
-             border-width: 0px 0 0px 30px;
+            border-style: double;
+            border-width: 0px 0 0px 30px;
 
 
 
-    }
+        }
 
-    .current_score_label{
-      font-family: GameFont;
-      font-size: 18pt;
-    }
+        .current_score_label{
+            font-family: GameFont;
+            font-size: 18pt;
+        }
 
-    #current_score_value{
-      font-family: GameFont;
-      font-size: 24pt;
-    }
+        #current_score_value{
+            font-family: GameFont;
+            font-size: 24pt;
+        }
 
-    .best_score_label{
-      margin-top: 30px;
-      font-family: BuddyScoreFont;
-      font-size: 16pt;
-    }
+        .best_score_label{
+            margin-top: 30px;
+            font-family: BuddyScoreFont;
+            font-size: 16pt;
+        }
 
-    #best_score_value{
-      font-family: BuddyScoreFont;
-      font-size: 18pt;
-    }
+        #best_score_value{
+            font-family: BuddyScoreFont;
+            font-size: 18pt;
+        }
 
-    /*.dogecoin{*/
-    /*    position: absolute;*/
-    /*    width: 20px;*/
-    /*    height: 20px;*/
-    /*    top:20px;*/
-    /*    bottom: 20px;*/
-    /*    background-image: url("assets/dogecoin.png");*/
-    /*    background-color: #f1f1f1;*/
-    /*    z-index: 99;*/
-    /*}*/
-  </style>
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 50px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .topnav{
+            position: absolute;
+            top: 25px;
+            right: 20px;
+            font-size: 25pt;
+            font-weight: bold;
+            color: white;
+        }
+
+        /*.dogecoin{*/
+        /*    position: absolute;*/
+        /*    width: 20px;*/
+        /*    height: 20px;*/
+        /*    top:20px;*/
+        /*    bottom: 20px;*/
+        /*    background-image: url("assets/dogecoin.png");*/
+        /*    background-color: #f1f1f1;*/
+        /*    z-index: 99;*/
+        /*}*/
+    </style>
 </head>
-<body onload="getLeadBoard()">
+<body onload="closeLiderBoard()">
 <script>
     window.best_score={{ bestScore }};
     window._uid= "{{ userid }}";
@@ -272,35 +373,47 @@
 <div id="score">0</div>
 
 <div id="dashboard">
-  <div id="startgame">
-      <div id="game_title">Coin Merge</div>
-      <div id="game_buddies">
-        <div id="game_buddies_list">
+    <div class="topnav" onclick="showLiderBoard()">
+        <img src="/static/assets/person.png" height="40px">
+    </div>
+    <div id="startgame">
+        <div id="game_title">Coin Merge</div>
+        <div id="game_buddies">
+            <div id="game_buddies_list">
 
+            </div>
+            <div class="share" onclick="TelegramGameProxy.shareScore()">Share with friends</div>
         </div>
-        <div class="share" onclick="TelegramGameProxy.shareScore()">Share with friends</div>
-      </div>
-      <div class="play-button-outer" onclick="startGame()">
-        <div class="play-button"></div>
-      </div>
-  </div>
+        <div class="play-button-outer" onclick="startGame()">
+            <div class="play-button"></div>
+        </div>
+    </div>
 </div>
 </div>
 
 <div id="gameover" class="centered">
-  <span class="current_score_label">Your score</span>
-  <span id="current_score_value">100</span>
-  <span class="best_score_label">Your best score</span>
-  <span id="best_score_value">100</span>
-  <div class="share" onclick="TelegramGameProxy.shareScore()">Share with friends</div>
-  <div id="continue" class="share" onclick="pause()">Resume</div>
+    <div class="topnav" onclick="showLiderBoard()">
+        <img src="/static/assets/person.png" height="40px">
+    </div>
+    <span class="current_score_label">Your score</span>
+    <span id="current_score_value">100</span>
+    <span class="best_score_label">Your best score</span>
+    <span id="best_score_value">100</span>
+    <div class="share" onclick="TelegramGameProxy.shareScore()">Share with friends</div>
+    <div id="continue" class="share" onclick="pause()">Resume</div>
 
     <div class="play-button-outer" onclick="startGame()">
         <div class="play-button"></div>
-  </div>
+    </div>
+</div>
+
+<div id="leaderboard" class="centered">
+    <span id="closeGlobalBoard" class="close-btn" onclick="closeLiderBoard()">&times;</span>
+    <div id="globalBoard" class="liderboard_holder">
+    </div>
 </div>
 
 <div id="pause" class="pause" onclick="pause()"></div>
-<script src="/static/js/game.js"></script>
+<script src="/static/js/gameV1.js"></script>
 </body>
 </html>

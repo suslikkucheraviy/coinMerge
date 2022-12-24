@@ -66,16 +66,16 @@ function ressetScore(){
 }
 
 function updategamescore(){
-        fetch('https://coingame.mdprojectth.fun/game/updatescore/'+_uid, {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ "score": score })
-})
-.then(response => response.json())
-.then(response => console.log(JSON.stringify(response)))
+    fetch('https://coingame.mdprojectth.fun/game/updatescore/'+_uid, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ "score": score })
+    })
+        .then(response => response.json())
+        .then(response => console.log(JSON.stringify(response)))
 }
 
 // height = element.clientHeight;  // height with padding
@@ -105,9 +105,9 @@ Events = Matter.Events;
 Matter.Resolver._restingThresh = 2;
 
 var celling = Bodies.rectangle(0, TOP*2+10 ,2*width, 1, { isStatic: true, isSensor:true, render: {
-        fillStyle: 'gray',
-        strokeStyle: 'gray',
-        opacity: 0.1,
+        fillStyle: 'white',
+        strokeStyle: 'white',
+        opacity: 0.3,
         lineWidth: 3
     } });
 
@@ -115,8 +115,10 @@ celling.label="celling";
 var ground = Bodies.rectangle(1, height ,2*width+1, 100, {
     isStatic: true,
     render: {
-        fillStyle: "transparent",
-        lineWidth: 3
+        fillStyle: 'transparent',
+        strokeStyle: 'white',
+        opacity: 0.5,
+        lineWidth: 5
     }
 });
 var left = Bodies.rectangle(-25, 10, 50, height*2, {
@@ -324,7 +326,7 @@ function linkHooks(){
             Matter.Composite.remove(engine.world, wait_list[i][1]);
             removed.push(wait_list[i][0]);
             removed.push(wait_list[i][1]);
-                    // alert(object_levels[nl[1]].length);
+            // alert(object_levels[nl[1]].length);
             if (nl[1] != '') {
                 console.log("Removing");
                 var nw = Bodies.circle(x, y, nl[2]);
@@ -355,13 +357,13 @@ function linkHooks(){
     var me=false;
     var wait_list=[]
     Events.on(engine, "circles", function (event){
-            console.log(">>>",event.bodyA.id, event.bodyB.id);
-            console.log(">>>",event.bodyA.position.x, event.bodyA.position.y, event.bodyA.circleRadius)
-            distSq=(event.bodyA.position.x-event.bodyB.position.x)*(event.bodyA.position.x-event.bodyB.position.x)+(event.bodyA.position.y-event.bodyB.position.y)*(event.bodyA.position.y-event.bodyB.position.y)
-            radSumSq=(event.bodyA.circleRadius+event.bodyB.circleRadius)*(event.bodyA.circleRadius+event.bodyB.circleRadius)
-            if(distSq<=radSumSq) {
-                wait_list.push([event.bodyA, event.bodyB]);
-            }
+        console.log(">>>",event.bodyA.id, event.bodyB.id);
+        console.log(">>>",event.bodyA.position.x, event.bodyA.position.y, event.bodyA.circleRadius)
+        distSq=(event.bodyA.position.x-event.bodyB.position.x)*(event.bodyA.position.x-event.bodyB.position.x)+(event.bodyA.position.y-event.bodyB.position.y)*(event.bodyA.position.y-event.bodyB.position.y)
+        radSumSq=(event.bodyA.circleRadius+event.bodyB.circleRadius)*(event.bodyA.circleRadius+event.bodyB.circleRadius)
+        if(distSq<=radSumSq) {
+            wait_list.push([event.bodyA, event.bodyB]);
+        }
         //     if(me) return;
         // //me=true;
         //     var x = event.bodyA.position.x;
@@ -610,11 +612,16 @@ function stopGame(){
     document.getElementById("score").style.display="none";
     document.getElementById("pause").style.display="none";
 
-    document.getElementById('current_score_value').innerHTML=score;
+
+
     if(score>window.best_score){
         window.best_score=score;
         updategamescore();
     }
+
+    document.getElementById('current_score_value').innerHTML=score;
+    document.getElementById('best_score_value').innerHTML=window.best_score;
+
     Matter.World.clear(engine.world);
     Engine.clear(engine);
     Render.stop(render);
@@ -632,6 +639,14 @@ function pause(){
     runner.enabled=!is_paused;
 
     if(is_paused){
+
+        if(score>window.best_score){
+            window.best_score=score;
+            updategamescore();
+        }
+        document.getElementById('current_score_value').innerHTML=score;
+        document.getElementById('best_score_value').innerHTML=window.best_score;
+
         render.canvas.style.display="none";
         document.getElementById("score").style.display="none";
         document.getElementById("pause").style.display="none";
@@ -730,24 +745,26 @@ function getLeadBoard(){
     let url = 'https://coingame.mdprojectth.fun/game/buddy/'+window._uid;
 
     fetch(url)
-    .then(res => res.json())
-    .then(out =>{
-        buddies=document.getElementById('game_buddies_list');
-        buddies.innerHTML="";
-        var count = Object.keys(out).length;
-        console.log('Checkout this JSON! ', count)
-        for(var i=0; i<count; i++){
-            buddies.innerHTML+="<div class=\"buddy\">\n" +
-                "          <div class=\"buddy_logo\">\n" +
-                "            <img src=\""+"data:image/png;base64,"+out[i+1][2]+"\">\n" +
-                "          </div>\n" +
-                "              <div class=\"buddy_score\">"+out[i+1][1]+"</div>\n" +
-                "          <div class=\"buddy_score\">"+out[i+1][0].toString()+"</div>\n" +
-                "        </div>";
-        }
-    })
-    .catch(err => { throw err });
+        .then(res => res.json())
+        .then(out =>{
+            buddies=document.getElementById('game_buddies_list');
+            buddies.innerHTML="";
+            var count = Object.keys(out).length;
+            console.log('Checkout this JSON! ', count)
+            for(var i=0; i<count; i++){
+                buddies.innerHTML+="<div class=\"buddy\">\n" +
+                    "          <div class=\"buddy_logo\">\n" +
+                    "            <img src=\""+"data:image/png;base64,"+out[i+1][2]+"\">\n" +
+                    "          </div>\n" +
+                    "              <div class=\"buddy_score\">"+out[i+1][1]+"</div>\n" +
+                    "          <div class=\"buddy_score\">"+out[i+1][0].toString()+"</div>\n" +
+                    "        </div>";
+            }
+        })
+        .catch(err => { throw err });
 }
+
+
 
 function addBody(){
     gravity=engine.world.gravity;
@@ -771,4 +788,78 @@ function addBody(){
 
 
     // var circle=Bodies.circle(400, 200, 40);
+}
+
+
+
+// function showLiderBoard(){
+//     document.getElementById("dashboard").style.display="none";
+//     // getLeadBoardGlobal();
+//     // document.getElementById("leaderboard").style.display='flex';
+// }
+
+var open_shapshot=0;
+var views=["dashboard", "gameover"]
+
+function m(n,d){x=(''+n).length,p=Math.pow,d=p(10,d)
+x-=x%3
+    if(n<1000) return n;
+return Math.round(n*d/p(10,x))/d+" kMGTPE"[x/3]}
+
+function getLeadBoardGlobal(){
+    let url = 'https://coingame.mdprojectth.fun/game/liders/'+window._uid;
+
+    fetch(url)
+        .then(res => res.json())
+        .then(out =>{
+            buddies=document.getElementById('globalBoard');
+            buddies.innerHTML="";
+            var count = Object.keys(out).length;
+            console.log('Checkout this JSON! ', count)
+            for(var i=0; i<count; i++){
+
+                buddies.innerHTML+="<div class=\"liderboard_item\">\n" +
+                    "            <div class=\"liderboard_item_position\">"+(i+1).toString()+"</div>" +
+                    "            <div class=\"liderboard_item_logo\">\n" +
+                    "                <div class=\"liderboard_item_logo_holder\">\n" +
+                    "                    <img src=\""+"data:image/png;base64,"+out[i+1][2]+"\">\n" +
+                    "                </div>\n" +
+                    "            </div>\n" +
+                    "            <div class=\"liderboard_item_name\">\n"
+                    +out[i+1][1] +
+                    "            </div>\n" +
+                    "            <div class=\"liderboard_item_score\">\n" +
+                    "                <div class=\"lider_score\">\n"+m(out[i+1][0], 2).toString()+"</div>\n" +
+                    "            </div>\n" +
+                    "        </div>"
+
+                // buddies.innerHTML+="<div class=\"buddy\">\n" +
+                //     "          <div class=\"buddy_logo\">\n" +
+                //     "            <img src=\""+"data:image/png;base64,"+out[i+1][2]+"\">\n" +
+                //     "          </div>\n" +
+                //     "              <div class=\"buddy_score\">"+out[i+1][1]+"</div>\n" +
+                //     "          <div class=\"buddy_score\">"+out[i+1][0].toString()+"</div>\n" +
+                //     "        </div>";
+            }
+        })
+        .catch(err => { throw err });
+}
+
+
+function closeLiderBoard(){
+    document.getElementById("leaderboard").style.display='none';
+    document.getElementById(views[open_shapshot]).style.visibility="visible";
+}
+
+function showLiderBoard(){
+
+    for(var i=0; i<views.length; i++){
+        if(document.getElementById(views[i]).style.visibility!="hidden"){
+            open_shapshot=i;
+            document.getElementById(views[i]).style.visibility="hidden";
+            break;
+        }
+    }
+    document.getElementById("leaderboard").style.display='flex';
+    getLeadBoardGlobal();
 }
