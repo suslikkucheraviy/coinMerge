@@ -190,7 +190,7 @@ function linkHooks(){
         else if(rnd<0.99) counter=8
         else if(rnd<0.995) counter=9
         else counter=10
-
+        let pos=next_ball.position.x;
         Matter.Body.applyForce( next_ball, {x: next_ball.position.x, y: next_ball.position.y}, {x: 0.0, y: 0.0});
 
         next_ball=null;
@@ -201,7 +201,7 @@ function linkHooks(){
         if(counter>10) counter=1;
         setTimeout(function(){
             scaleImage(object_levels['L'+counter][3], object_levels['L'+counter][2], object_levels['L'+counter][2], function(canvas){
-                next_ball=Bodies.circle(200, TOP, object_levels['L'+counter][0]);
+                next_ball=Bodies.circle(pos, TOP, object_levels['L'+counter][0]);
                 next_ball.label="L"+counter;
                 next_ball.restitution=0.1;
                 next_ball.render.sprite.texture=object_levels['L'+counter][4];
@@ -251,6 +251,8 @@ function linkHooks(){
         else if(rnd<0.995) counter=9
         else counter=10
 
+        let pos=next_ball.position.x;
+
         Matter.Body.applyForce( next_ball, {x: next_ball.position.x, y: next_ball.position.y}, {x: 0.0, y: 0.0});
 
         next_ball=null;
@@ -261,7 +263,7 @@ function linkHooks(){
         if(counter>10) counter=1;
         setTimeout(function(){
             scaleImage(object_levels['L'+counter][3], object_levels['L'+counter][2], object_levels['L'+counter][2], function(canvas){
-                next_ball=Bodies.circle(200, TOP, object_levels['L'+counter][0]);
+                next_ball=Bodies.circle(pos, TOP, object_levels['L'+counter][0]);
                 next_ball.label="L"+counter;
                 next_ball.restitution=0.1;
                 next_ball.render.sprite.texture=object_levels['L'+counter][4];
