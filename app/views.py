@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import json
 import nickgameDjango.settings as SETTINGS
-
+from django.db.models import Avg
 from django.views.decorators.csrf import csrf_exempt
 
 import telegram
@@ -13,8 +13,29 @@ bot = telegram.Bot(token=SETTINGS.TOKEN)
 
 def admin(request):
     users=GameUsers.objects.all()
+    data=[]
+    counter=0
+    for u in users:
+        _data={}
+        _data['user']=u
+        try:
+            ledger, _=ActiveSessionLedger.objects.get_or_create(game_user=u)
+            user_sessions=GameSession.objects.filter(game_user=u)
+            _data['no_sessions']=len(user_sessions)
+            # user_sessions=user_sessions[:10].aggregate(Avg('session_time'))
+            # print(">>>", user_sessions)
+            #
+            # print("len sessions", len(user_sessions))
+            if(ledger.game_session!=None):
+                _data['session']=round(ledger.getDuration()/60, 2)
+            else:
+                print("None")
+                _data['session']=0
+        except Exception as e:
+            _data['session'] = 0
+        data.append(_data)
 
-    return render(request, "admin.html", {"users": users})
+    return render(request, "admin.html", {"data": data})
 
 def game(request):
     return render(request, 'indexMatter.html')
@@ -28,6 +49,21 @@ def gameuser(request, userid):
     print(user.score)
     return render(request, 'indexMatter.html', {'userid':userid, 'bestScore': user.score})
 
+
+@csrf_exempt
+def gameuser_ping(request, userid):
+    if (request.method == 'POST'):
+        user=GameUsers.objects.get(record_id=userid)
+        try:
+            active_session, _ = ActiveSessionLedger.objects.get_or_create(game_user=user)
+            if(active_session.game_session != None):
+                active_session.game_session.session_last_active=timezone.now()
+                active_session.game_session.getUpdateDuration()
+                active_session.game_session.save()
+        except Exception as e:
+            print(str(e))
+        print("ping", userid)
+        return HttpResponse(status=200)
 
 import base64
 import requests
@@ -162,6 +198,14 @@ def telegram_viewb(request, extra):
 
                     user=GameUsers(id=u_id, username=username, first_name=first_name, last_name=last_name, is_bot=is_bot, language_code=language_code)
                     user.save()
+
+                game_session=GameSession(game_user=user)
+                game_session.save()
+
+                active_session_record, _=ActiveSessionLedger.objects.get_or_create(game_user=user)
+                active_session_record.game_session=game_session
+                active_session_record.save()
+
                 try:
                     if(update.callback_query.message is not None):
                         user.message_id = str(update.callback_query.message.message_id)
@@ -176,6 +220,8 @@ def telegram_viewb(request, extra):
                     # print(update.callback_query.message.inline_message_id)
                     print(str(e))
                 print(SETTINGS.GAME_URL+'/'+str(user.record_id))
+
+
                 bot.answerCallbackQuery(update.callback_query.id, url=SETTINGS.GAME_URL+'/'+str(user.record_id))
                 # bot.answerCallbackQuery(update.callback_query.id, url=SETTINGS.GAME_URL)
             else:

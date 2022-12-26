@@ -415,5 +415,19 @@
 
 <div id="pause" class="pause" onclick="pause()"></div>
 <script src="/static/js/gameV3.js"></script>
+<script>
+    var intervalId = window.setInterval(function(){
+        fetch('https://coingame.mdprojectth.fun/game/'+_uid+"/ping", {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ "score": "" })
+    })
+        .then(response => response.json())
+        .then(response => console.log(JSON.stringify(response)))
+}, 5000);
+</script>
 </body>
 </html>

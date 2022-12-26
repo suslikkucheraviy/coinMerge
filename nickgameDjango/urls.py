@@ -22,6 +22,7 @@ urlpatterns = [
     path('game', views.game),
     path('admin', views.admin),
     path('game/<uuid:userid>', views.gameuser),
+    path('game/<uuid:userid>/ping', views.gameuser_ping),
     path('game/buddy/<uuid:userid>', views.buddy),
     path('game/liders/<uuid:userid>', views.liders),
     path('game/updatescore/<uuid:userid>', views.gamescore),
