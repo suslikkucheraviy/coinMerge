@@ -2,11 +2,11 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import json
 import nickgameDjango.settings as SETTINGS
-from django.db.models import Avg
+from django.db.models import Avg, Count
 from django.views.decorators.csrf import csrf_exempt
 
 import telegram
-
+import datetime
 from app.models import *
 
 bot = telegram.Bot(token=SETTINGS.TOKEN)
@@ -22,7 +22,11 @@ def admin(request):
             ledger, _=ActiveSessionLedger.objects.get_or_create(game_user=u)
             user_sessions=GameSession.objects.filter(game_user=u)
             _data['no_sessions']=len(user_sessions)
-            # user_sessions=user_sessions[:10].aggregate(Avg('session_time'))
+            print("No", (len(user_sessions)))
+            user_sessions = GameSession.objects.filter(game_user=u)[:10]
+            last10AverageTime=user_sessions.aggregate(Avg('session_time'))
+            last10AverageTime=last10AverageTime['session_time__avg']
+            _data['avg_sessions_time'] = round(last10AverageTime/60,2)
             # print(">>>", user_sessions)
             #
             # print("len sessions", len(user_sessions))
@@ -32,10 +36,19 @@ def admin(request):
                 print("None")
                 _data['session']=0
         except Exception as e:
+            print(e)
             _data['session'] = 0
         data.append(_data)
 
-    return render(request, "admin.html", {"data": data})
+    #active users last 24h
+    time_threshold = datetime.datetime.now() - datetime.timedelta(hours=24)
+    results = ActiveSessionLedger.objects.filter(game_session__session_last_active__gt=time_threshold)
+    results=results.annotate(total=Count('game_user', distinct=True)).count()
+    stats={}
+    stats['last24hActives']=results
+    stats['totalNoUsers']=GameUsers.objects.all().count()
+    print(results)
+    return render(request, "admin.html", {"stats": stats, "data": data})
 
 def game(request):
     return render(request, 'indexMatter.html')
@@ -196,7 +209,14 @@ def telegram_viewb(request, extra):
                     is_bot = update.callback_query.from_user.is_bot
                     language_code = update.callback_query.from_user.language_code
 
-                    user=GameUsers(id=u_id, username=username, first_name=first_name, last_name=last_name, is_bot=is_bot, language_code=language_code)
+                    _fname=""
+                    _lname=""
+                    if(first_name!=None):
+                        _fname=first_name
+                    if(last_name!=None):
+                        _lname=last_name
+
+                    user=GameUsers(id=u_id, username=username, first_name=_fname, last_name=_lname, is_bot=is_bot, language_code=language_code)
                     user.save()
 
                 game_session=GameSession(game_user=user)

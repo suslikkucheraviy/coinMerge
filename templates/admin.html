@@ -5,8 +5,56 @@
     <title>Admin</title>
 </head>
 <style>
+
+    @font-face {
+        font-family: GameFont;
+        src: url(/static/fonts/Paytone_One/PaytoneOne-Regular.ttf);
+    }
+
+    @font-face {
+        font-family: BuddyScoreFont;
+        src: url(/static/fonts/Anek_Gurmukhi/static/AnekGurmukhi/AnekGurmukhi-Regular.ttf);
+    }
+
+    #statistics{
+        width: calc(100% - 100px);
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 50px;
+    }
+
+    #info{
+        display: flex;
+        justify-content: center;
+    }
+
+    .stat_item{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        {#background-color: rgb(74, 136, 218);#}
+        background-color: white;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 20px rgba(0,0,0, 0.2);
+    }
+
+    .stat_label{
+        color: black;
+        font-family: BuddyScoreFont;
+        font-size: 18pt;
+    }
+
+    .stat_value{
+        color: black;
+        font-family: BuddyScoreFont;
+        font-size: 24pt;
+    }
+
 table{
-    width: 100%;
+    width: calc(100% - 100px);
 }
 
 table th{
@@ -15,24 +63,38 @@ table th{
 
 </style>
 <body>
-<table>
-<tr>
-  <th colspan="1">Username</th>
-  <th colspan="1">Name</th>
-  <th colspan="1">Surname</th>
-  <th colspan="1">Score</th>
-  <th colspan="1">Sessions Count</th>
-  <th colspan="1">Last Session Duration (min)</th>
-</tr>
-{% for x in data %}
-<tr>
-  <td>{{ x.user.username }}</td>
-  <td>{{ x.user.first_name }}</td>
-  <td>{{ x.user.last_name }}</td>
-  <td>{{ x.user.score }}</td>
-  <td>{{ x.no_sessions }}</td>
-  <td>{{ x.session }}</td>
-{% endfor %}
-</table>
+<div id="statistics">
+    <div class="stat_item">
+        <div class="stat_label">Active Users (In last 24h)</div>
+        <div class="stat_value"> {{ stats.last24hActives }}</div>
+    </div>
+    <div class="stat_item">
+        <div class="stat_label">Total # of users</div>
+        <div class="stat_value"> {{ stats.totalNoUsers }}</div>
+    </div>
+</div>
+<div id="info">
+    <table>
+    <tr>
+      <th colspan="1">Username</th>
+      <th colspan="1">Name</th>
+      <th colspan="1">Surname</th>
+      <th colspan="1">Score</th>
+      <th colspan="1">Sessions Count</th>
+      <th colspan="1">Last Session Duration (min)</th>
+      <th colspan="1">Average Duration (min)</th>
+    </tr>
+    {% for x in data %}
+    <tr>
+      <td>{{ x.user.username }}</td>
+      <td>{{ x.user.first_name }}</td>
+      <td>{{ x.user.last_name }}</td>
+      <td>{{ x.user.score }}</td>
+      <td>{{ x.no_sessions }}</td>
+      <td>{{ x.session }}</td>
+      <td>{{ x.avg_sessions_time }}</td>
+    {% endfor %}
+    </table>
+</div>
 </body>
 </html>
