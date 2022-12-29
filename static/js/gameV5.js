@@ -25,27 +25,27 @@ var is_paused=false;
 
 if(DEPLOYMENT) {
 
-    object_levels['L1'] = [25, 'L2', 30, '/static/assets/10.png',];
-    object_levels['L2'] = [30, 'L3', 35, '/static/assets/9.png'];
-    object_levels['L3'] = [35, 'L4', 40, '/static/assets/8.png'];
-    object_levels['L4'] = [40, 'L5', 45, '/static/assets/7.png'];
-    object_levels['L5'] = [45, 'L6', 50, '/static/assets/6.png'];
-    object_levels['L6'] = [50, 'L7', 55, '/static/assets/5.png'];
-    object_levels['L7'] = [55, 'L8', 60, '/static/assets/4.png'];
-    object_levels['L8'] = [60, 'L9', 65, '/static/assets/3.png'];
-    object_levels['L9'] = [65, 'L10', 70, '/static/assets/2.png'];
-    object_levels['L10'] = [70, '', 75, '/static/assets/1.png'];
+    object_levels['L1'] = [35, 'L2', 40, '/static/assets/10.png',];
+    object_levels['L2'] = [40, 'L3', 45, '/static/assets/9.png'];
+    object_levels['L3'] = [45, 'L4', 50, '/static/assets/8.png'];
+    object_levels['L4'] = [50, 'L5', 55, '/static/assets/7.png'];
+    object_levels['L5'] = [55, 'L6', 60, '/static/assets/6.png'];
+    object_levels['L6'] = [60, 'L7', 65, '/static/assets/5.png'];
+    object_levels['L7'] = [65, 'L8', 70, '/static/assets/4.png'];
+    object_levels['L8'] = [70, 'L9', 75, '/static/assets/3.png'];
+    object_levels['L9'] = [75, 'L10', 80, '/static/assets/2.png'];
+    object_levels['L10'] = [80, '', 85, '/static/assets/1.png'];
 }else{
-    object_levels['L1'] = [25, 'L2', 30, '../static/assets/10.png',];
-    object_levels['L2'] = [30, 'L3', 35, '../static/assets/9.png'];
-    object_levels['L3'] = [35, 'L4', 40, '../static/assets/8.png'];
-    object_levels['L4'] = [40, 'L5', 45, '../static/assets/7.png'];
-    object_levels['L5'] = [45, 'L6', 50, '../static/assets/6.png'];
-    object_levels['L6'] = [50, 'L7', 55, '../static/assets/5.png'];
-    object_levels['L7'] = [55, 'L8', 60, '../static/assets/4.png'];
-    object_levels['L8'] = [60, 'L9', 65, '../static/assets/3.png'];
-    object_levels['L9'] = [65, 'L10', 70, '../static/assets/2.png'];
-    object_levels['L10'] = [70, '', 75, '../static/assets/1.png'];
+    object_levels['L1'] = [35, 'L2', 40, '../static/assets/10.png',];
+    object_levels['L2'] = [40, 'L3', 45, '../static/assets/9.png'];
+    object_levels['L3'] = [45, 'L4', 50, '../static/assets/8.png'];
+    object_levels['L4'] = [50, 'L5', 55, '../static/assets/7.png'];
+    object_levels['L5'] = [55, 'L6', 60, '../static/assets/6.png'];
+    object_levels['L6'] = [60, 'L7', 65, '../static/assets/5.png'];
+    object_levels['L7'] = [65, 'L8', 70, '../static/assets/4.png'];
+    object_levels['L8'] = [70, 'L9', 75, '../static/assets/3.png'];
+    object_levels['L9'] = [75, 'L10', 80, '../static/assets/2.png'];
+    object_levels['L10'] = [80, '', 85, '../static/assets/1.png'];
 }
 
 var score=0;
