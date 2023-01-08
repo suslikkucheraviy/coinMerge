@@ -1,32 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="mdupc@mdprojectth.fun:22 key (2)" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="root@139.180.221.254:22" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="mdupc@mdprojectth.fun:22 key">
+      <paths name="root@139.180.221.254:22">
         <serverdata>
           <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="mdupc@mdprojectth.fun:22 key (2)">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/home/mdupc/game" local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="root@104.248.199.75:22 password">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="root@104.248.199.75:22 password (2)">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/etc/coingame" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

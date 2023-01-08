@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-l%=0h#ah#-=t&w=m-lvyro3*o6vt@2jjs=wr)6$y$r==q35kx@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['coingame.mdprojectth.fun']
+ALLOWED_HOSTS = ['139.180.221.254', 'coingame.mdprojectth.fun']
 
 
 # Application definition
@@ -75,10 +75,20 @@ WSGI_APPLICATION = 'nickgameDjango.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+
+    #     'NAME': str(BASE_DIR) + '/db.sqlite3',
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'coingame',
+        'USER': 'coingame',
+        'PASSWORD': 'ERjcnr938dj3',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
@@ -118,8 +128,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT= '/home/mdupc/game/static_dep'
-STATICFILES_DIRS = ('/home/mdupc/game/static', )
+STATIC_ROOT= '/etc/coingame/static_dep'
+STATICFILES_DIRS = ('/etc/coingame/static', )
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
