@@ -24,6 +24,16 @@
         padding: 50px;
     }
 
+     #pager{
+        width: calc(100% - 100px);
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        padding: 50px;
+    }
+
+
+
     #info{
         display: flex;
         justify-content: center;
@@ -79,8 +89,8 @@ table th{
       <th colspan="1">Username</th>
       <th colspan="1">Name</th>
       <th colspan="1">Surname</th>
-      <th colspan="1">Score</th>
-      <th colspan="1">Sessions Count</th>
+        <th colspan="1"><a href="/admin?score=1">Score</a></th>
+        <th colspan="1"><a href="/admin?session=1">Sessions Count</a></th>
       <th colspan="1">Last Session Duration (min)</th>
       <th colspan="1">Average Duration (min)</th>
     </tr>
@@ -95,6 +105,16 @@ table th{
       <td>{{ x.avg_sessions_time }}</td>
     {% endfor %}
     </table>
+
+</div>
+<div id="pager">
+    {% for x in pages %}
+        {% if x.1%}
+            <div onclick="">{{ x.0 }}</div>
+        {% else %}
+            <div><a href="/admin?p={{ x.0 }}">{{ x.0 }}</a></div>
+        {% endif %}
+    {% endfor %}
 </div>
 </body>
 </html>

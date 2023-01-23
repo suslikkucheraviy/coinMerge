@@ -26,6 +26,9 @@ urlpatterns = [
     path('game/buddy/<uuid:userid>', views.buddy),
     path('game/liders/<uuid:userid>', views.liders),
     path('game/updatescore/<uuid:userid>', views.gamescore),
-    path('<str:extra>', views.telegram_viewb)
+    path('game/profilepic/<str:userid>', views.getProfileImage),
+    # path('linkhook', views.telegram_hook),
+    path('<str:extra>', views.telegram_viewb),
+    # path('', views.telegram_test),
 
 ]

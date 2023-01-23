@@ -66,7 +66,7 @@ function ressetScore(){
 }
 
 function updategamescore(){
-    fetch('https://coingame.mdprojectth.fun/game/updatescore/'+_uid, {
+    fetch('/game/updatescore/'+_uid, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -744,7 +744,7 @@ function startGame(){
 }
 
 function getLeadBoard(){
-    let url = 'https://coingame.mdprojectth.fun/game/buddy/'+window._uid;
+    let url = '/game/buddy/'+window._uid;
 
     fetch(url)
         .then(res => res.json())
@@ -809,7 +809,7 @@ x-=x%3
 return Math.round(n*d/p(10,x))/d+" kMGTPE"[x/3]}
 
 function getLeadBoardGlobal(){
-    let url = 'https://coingame.mdprojectth.fun/game/liders/'+window._uid;
+    let url = '/game/liders/'+window._uid;
 
     fetch(url)
         .then(res => res.json())

@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-l%=0h#ah#-=t&w=m-lvyro3*o6vt@2jjs=wr)6$y$r==q35kx@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['139.180.221.254', 'coingame.mdprojectth.fun']
+ALLOWED_HOSTS = ['139.180.221.254', 'coingames.site']
 
 
 # Application definition
@@ -128,8 +128,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT= '/etc/coingame/static_dep'
-STATICFILES_DIRS = ('/etc/coingame/static', )
+STATIC_ROOT= '/var/www/html/coingame/static_dep'
+STATICFILES_DIRS = ('/var/www/html/coingame/static',)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -138,5 +138,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 TOKEN = "5694657024:AAGMg8n82ovhR5eitwlu64fxHtk_Q8ZFf5A"
-URL = "https://coingame.mdprojectth.fun/"
-GAME_URL = "https://coingame.mdprojectth.fun/game"
+CUSTOMTOKEN = "3889523fjud0385nn23850jn3495n3h4j693jd7395"
+URL = "https://coingames.site/"
+GAME_URL = "https://coingames.site/game"
