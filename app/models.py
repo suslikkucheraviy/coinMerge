@@ -16,6 +16,7 @@ class GameUsers(models.Model):
     is_blocked=models.BooleanField(default=False)
     message_id=models.CharField(max_length=200)
     is_message=models.BooleanField(default=False)
+    average_time = models.FloatField(default=0)
 
 class GameSession(models.Model):
     record_id = models.UUIDField(primary_key=True, default=uuid.uuid4)

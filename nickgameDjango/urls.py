@@ -21,6 +21,8 @@ urlpatterns = [
     # path('admin/', admin.site.urls),
     path('game', views.game),
     path('admin', views.admin),
+    path('admin/<uuid:userid>/block', views.block),
+    path('admin/<uuid:userid>/unblock', views.unblock),
     path('game/<uuid:userid>', views.gameuser),
     path('game/<uuid:userid>/ping', views.gameuser_ping),
     path('game/buddy/<uuid:userid>', views.buddy),

@@ -5,6 +5,9 @@
     <title>Admin</title>
 </head>
 <style>
+    html{
+        font-family: Arial;
+    }
 
     @font-face {
         font-family: GameFont;
@@ -32,6 +35,17 @@
         padding: 50px;
     }
 
+     .modal_row{
+         display: flex;
+         flex-direction: row;
+         margin-top: 5px;
+         margin-bottom: 5px;
+     }
+
+     .modal_row .label{
+         width: 50%;
+         min-width: 24ch;
+     }
 
 
     #info{
@@ -51,6 +65,14 @@
         box-shadow: 0px 0px 20px rgba(0,0,0, 0.2);
     }
 
+    #action{
+        margin-top: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .stat_label{
         color: black;
         font-family: BuddyScoreFont;
@@ -62,6 +84,46 @@
         font-family: BuddyScoreFont;
         font-size: 24pt;
     }
+
+    /* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
 
 table{
     width: calc(100% - 100px);
@@ -89,16 +151,23 @@ table th{
       <th colspan="1">Username</th>
       <th colspan="1">Name</th>
       <th colspan="1">Surname</th>
-        <th colspan="1"><a href="/admin?score=1">Score</a></th>
-        <th colspan="1"><a href="/admin?session=1">Sessions Count</a></th>
-      <th colspan="1">Last Session Duration (min)</th>
-      <th colspan="1">Average Duration (min)</th>
+        <th colspan="1">Status</th>
+        <th colspan="1"><a href="/admin?score={{filter_map.0}}">Score</a></th>
+        <th colspan="1"><a href="/admin?session={{filter_map.1}}">Sessions Count</a></th>
+        <th colspan="1"><a href="/admin?sessionduration={{filter_map.2}}">Last Session Duration (min)</a></th>
+        <th colspan="1"><a href="/admin?avgsessionduration={{ filter_map.3 }}"> Average Duration (min)</a></th>
     </tr>
     {% for x in data %}
-    <tr>
+    <tr onclick="openModal(this, '{{ x.user.record_id }}')">
       <td>{{ x.user.username }}</td>
       <td>{{ x.user.first_name }}</td>
       <td>{{ x.user.last_name }}</td>
+      <td>
+          {% if x.user.is_blocked == False %}
+           Active
+          {% else %}
+              Blocked
+          {% endif %}</td>
       <td>{{ x.user.score }}</td>
       <td>{{ x.no_sessions }}</td>
       <td>{{ x.session }}</td>
@@ -111,10 +180,64 @@ table th{
     {% for x in pages %}
         {% if x.1%}
             <div onclick="">{{ x.0 }}</div>
+        {% elif x.0 == -1 %}
+            <div>...</div>
         {% else %}
-            <div><a href="/admin?p={{ x.0 }}">{{ x.0 }}</a></div>
+            <div><a href="/admin{{ current_filter }}p={{ x.0 }}">{{ x.0 }}</a></div>
         {% endif %}
     {% endfor %}
 </div>
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+      <div class="modal_row"><div class="label">Username</div><div id="username">UN</div></div>
+      <div class="modal_row"><div class="label">Name</div><div id="fname">FN</div></div>
+      <div class="modal_row"><div class="label">Surname</div><div id="lname">SN</div></div>
+      <div class="modal_row"><div class="label">Status</div><div id="status">SN</div></div>
+      <div class="modal_row"><div class="label">Score</div><div id="score">SN</div></div>
+      <div class="modal_row"><div class="label">Sessions</div><div id="scount">SN</div></div>
+      <div class="modal_row"><div class="label">Last Session Duration</div><div id="sdur">SN</div></div>
+      <div class="modal_row"><div class="label">Average Session Duration</div><div id="sadur">SN</div></div>
+      <div id="action"><button>Block</button></div>
+  </div>
+
+</div>
+<script>
+// Get the modal
+var modal = document.getElementById("myModal");
+
+
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal
+function openModal(data, id) {
+    console.log(data);
+    document.getElementById('username').innerHTML=data.getElementsByTagName("td")[0].innerHTML;
+    document.getElementById('fname').innerHTML=data.getElementsByTagName("td")[1].innerHTML;
+    document.getElementById('lname').innerHTML=data.getElementsByTagName("td")[2].innerHTML;
+    document.getElementById('status').innerHTML=data.getElementsByTagName("td")[3].innerHTML;
+    document.getElementById('score').innerHTML=data.getElementsByTagName("td")[4].innerHTML;
+    document.getElementById('scount').innerHTML=data.getElementsByTagName("td")[5].innerHTML;
+    document.getElementById('sdur').innerHTML=data.getElementsByTagName("td")[6].innerHTML;
+    document.getElementById('sadur').innerHTML=data.getElementsByTagName("td")[7].innerHTML;
+  modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
 </body>
 </html>

@@ -16,15 +16,30 @@ def admin(request):
     allsize=GameUsers.objects.count()
     perpage=50
     c_page=int(request.GET.get("p",1))
-    sort_score=int(request.GET.get("score",-1))
-    sort_sessioncount=int(request.GET.get("session",-1))
+    sort_score=int(request.GET.get("score",0))
+    sort_sessioncount=int(request.GET.get("session",0))
+    sort_lastseesionduration=int(request.GET.get("sessionduration",0))
+    sort_avgseesionduration=int(request.GET.get("avgsessionduration",0))
     pages=round(allsize/perpage+0.5)
     page_list=[(i, c_page==i) for i in range(1, pages+1)]
-    if(sort_score!=-1):
-        users = GameUsers.objects.all().order_by("-score")[(c_page - 1) * perpage:(c_page) * perpage]
-    elif(sort_sessioncount!=-1):
-        users = GameSession.objects.all().values('game_user').annotate(c=Count('game_user')).order_by('-c').values('game_user')[(c_page - 1) * perpage:(c_page) * perpage]
+
+    filter_map = [1 if sort_score<=0 else -1, 1 if sort_sessioncount<=0 else -1, 1 if sort_lastseesionduration<=0 else -1, 1 if sort_avgseesionduration<=0 else -1]
+    current_filter="?"
+    if(sort_score!=0):
+        current_filter="?score={0}&".format(sort_score)
+        users = GameUsers.objects.all().order_by("{0}score".format("-" if sort_score>0 else ""))[(c_page - 1) * perpage:(c_page) * perpage]
+    elif(sort_sessioncount!=0):
+        current_filter="?session={0}&".format(sort_sessioncount)
+        users = GameSession.objects.all().values('game_user').annotate(c=Count('game_user')).order_by('{0}c'.format("-" if sort_sessioncount>0 else "")).values('game_user')[(c_page - 1) * perpage:(c_page) * perpage]
         users=[GameUsers.objects.get(pk=x['game_user']) for x in users]
+    elif(sort_lastseesionduration!=0):
+        current_filter="?sessionduration={0}&".format(sort_lastseesionduration)
+        users = ActiveSessionLedger.objects.all().order_by('{0}game_session__session_time'.format("-" if sort_lastseesionduration>0 else ""))[(c_page - 1) * perpage:(c_page) * perpage]
+        users = [x.game_session.game_user for x in users]
+    elif(sort_avgseesionduration!=0):
+        current_filter="?avgsessionduration={0}&".format(sort_avgseesionduration)
+        users = GameUsers.objects.all().order_by("{0}average_time".format("-" if sort_avgseesionduration > 0 else ""))[
+                (c_page - 1) * perpage:(c_page) * perpage]
     else:
         users=GameUsers.objects.all()[(c_page-1)*perpage:(c_page)*perpage]
     data=[]
@@ -35,13 +50,16 @@ def admin(request):
         _data['user']=u
         try:
             ledger, _=ActiveSessionLedger.objects.get_or_create(game_user=u)
-            user_sessions=GameSession.objects.filter(game_user=u)
-            _data['no_sessions']=len(user_sessions)
-            print("No", (len(user_sessions)))
+            no_user_sessions=GameSession.objects.filter(game_user=u).count()
+            _data['no_sessions']=no_user_sessions
+            print("No", no_user_sessions)
             user_sessions = GameSession.objects.filter(game_user=u)[:10]
             last10AverageTime=user_sessions.aggregate(Avg('session_time'))
             last10AverageTime=last10AverageTime['session_time__avg']
+            u.average_time = last10AverageTime
+            u.save()
             _data['avg_sessions_time'] = round(last10AverageTime/60,2)
+
             # print(">>>", user_sessions)
             #
             # print("len sessions", len(user_sessions))
@@ -63,7 +81,7 @@ def admin(request):
     stats['last24hActives']=results
     stats['totalNoUsers']=GameUsers.objects.all().count()
     print(results)
-    return render(request, "admin.html", {"stats": stats, "data": data, "pages": page_list})
+    return render(request, "admin.html", {"current_filter":current_filter, "filter_map": filter_map,"stats": stats, "data": data, "pages": page_list})
 
 def game(request):
     return render(request, 'indexMatter.html')
@@ -77,6 +95,22 @@ def gameuser(request, userid):
     print(user.score)
     return render(request, 'indexMatter.html', {'userid':userid, 'bestScore': user.score})
 
+@csrf_exempt
+def block(request, userid):
+    if (request.method == 'POST'):
+        user=GameUsers.objects.get(record_id=userid)
+        user.is_blocked=True
+        user.save()
+        return HttpResponse(status=200)
+
+@csrf_exempt
+def unblock(request, userid):
+    if (request.method == 'POST'):
+        user=GameUsers.objects.get(record_id=userid)
+        user.is_blocked=False
+        user.save()
+        return HttpResponse(status=200)
+
 
 @csrf_exempt
 def gameuser_ping(request, userid):
@@ -88,6 +122,11 @@ def gameuser_ping(request, userid):
                 active_session.game_session.session_last_active=timezone.now()
                 active_session.game_session.getUpdateDuration()
                 active_session.game_session.save()
+
+                user_sessions = GameSession.objects.filter(game_user=user)[:10]
+                last10AverageTime = user_sessions.aggregate(Avg('session_time'))
+                user.average_time=last10AverageTime['session_time__avg']
+                user.save()
         except Exception as e:
             print(str(e))
         print("ping", userid)
@@ -106,6 +145,7 @@ def buddy(request, userid):
         for u in res:
             print(u)
             print(u.user)
+            print(">>>", u.user.username, u.user.id)
             profpic=bot.getUserProfilePhotos(u.user.id, limit=1)
             img_path='https://coingame.mdprojectth.fun/static/assets/10bitcoin.png'
             if(profpic['total_count']>0):
@@ -142,7 +182,8 @@ def liders(request, userid):
         if(True):
             for u in top_10_users:
                 position+=1
-                profpic=bot.getUserProfilePhotos(u.id, limit=1)
+                # print(u.username)
+                # profpic=bot.getUserProfilePhotos(u.id, limit=1)
                 # img_path='https://coingames.site/static/assets/10bitcoin.png'
                 # # if(profpic['total_count']>0):
                 # if(False):
@@ -165,23 +206,25 @@ def liders(request, userid):
 
 def getProfileImage(request, userid):
     # user = GameUsers.objects.get(record_id=userid)
-    profpic = bot.getUserProfilePhotos(userid, limit=1)
-    img_path='https://coingames.site/static/assets/10bitcoin.png'
-    if(profpic['total_count']>0):
-    # if(False):
-        # print(
-        img = bot.getFile(profpic['photos'][0][0]['file_id'])
-        print(img)
-        img_path=img['file_path']
+    img_path = 'https://coingames.site/static/assets/1.png'
+    try:
+        profpic = bot.getUserProfilePhotos(userid, limit=1)
+        if(profpic['total_count']>0):
+        # if(False):
+            # print(
+            img = bot.getFile(profpic['photos'][0][0]['file_id'])
+            print(img)
+            img_path=img['file_path']
+            img_data = requests.get(img_path).content
+            # img_data  = base64.b64encode(img_data)
+        else:
+            img_data = requests.get(img_path).content
+            # img_data = base64.b64encode(img_data)
+            # print(img_data)
+            # with open(img_path, "rb") as image:
+            #     img_data = base64.b64encode(image.read())
+    except:
         img_data = requests.get(img_path).content
-        # img_data  = base64.b64encode(img_data)
-    else:
-        img_data = requests.get(img_path).content
-        # img_data = base64.b64encode(img_data)
-        # print(img_data)
-        # with open(img_path, "rb") as image:
-        #     img_data = base64.b64encode(image.read())
-
     response = HttpResponse(img_data, content_type="image/png")
     # img_data.save(response, "PNG")
     return response
