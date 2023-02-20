@@ -9,9 +9,11 @@ from django.views.decorators.csrf import csrf_exempt
 import telegram
 import datetime
 from app.models import *
+from django.contrib.auth.decorators import login_required
 
 bot = telegram.Bot(token=SETTINGS.TOKEN)
 
+@login_required(login_url='/accounts/login')
 def admin(request):
     allsize=GameUsers.objects.count()
     perpage=50
@@ -93,6 +95,9 @@ def gameuser(request, userid):
         user.score=0
         user.save()
     print(user.score)
+    if(user.is_blocked):
+        return render(request, 'blocked.html')
+    print("Best Score")
     return render(request, 'indexMatter.html', {'userid':userid, 'bestScore': user.score})
 
 @csrf_exempt
@@ -147,7 +152,7 @@ def buddy(request, userid):
             print(u.user)
             print(">>>", u.user.username, u.user.id)
             profpic=bot.getUserProfilePhotos(u.user.id, limit=1)
-            img_path='https://coingame.mdprojectth.fun/static/assets/10bitcoin.png'
+            img_path='https://coingames.site/static/assets/1.png'
             if(profpic['total_count']>0):
                 # print()
                 img = bot.getFile(profpic['photos'][0][0]['file_id'])
@@ -237,10 +242,9 @@ def gamescore(request, userid):
         data = json.loads(request.body)
         print(user.message_id)
         if(user.is_message):
-            bot.setGameScore(user.id, data['score'], message_id=user.message_id, force=1)
+            bot.setGameScore(user.id, data['score'], message_id=user.message_id, force=0)
         else:
-            bot.setGameScore(user.id, data['score'], inline_message_id=user.message_id, force=1)
-
+            bot.setGameScore(user.id, data['score'], inline_message_id=user.message_id, force=0)
         # bot.setGameScore(user_id=user.id, score=data['score'], message_id=user.message_id, chat_id=user.id)
         user.score=data['score']
         user.save()
@@ -287,6 +291,7 @@ def telegram_viewb(request, extra):
             json_data = json.loads(request.body)
             update = telegram.Update.de_json(json_data, bot)
             print(update)
+            # print(json_data['callback_query']['message']['chat'])
             #
             if (update.callback_query is not None):
                 try:
@@ -309,12 +314,19 @@ def telegram_viewb(request, extra):
                     user=GameUsers(id=u_id, username=username, first_name=_fname, last_name=_lname, is_bot=is_bot, language_code=language_code)
                     user.save()
 
+                try:
+                    chat_id=json_data['callback_query']['message']['chat']['id']
+                    user.chat_id=chat_id
+                    user.save()
+                except Exception as e:
+                    print(str(e))
+                    pass
+
                 game_session=GameSession(game_user=user)
                 game_session.save()
 
                 active_session_record, _=ActiveSessionLedger.objects.get_or_create(game_user=user)
                 active_session_record.game_session=game_session
-                active_session_record.save()
 
                 try:
                     if(update.callback_query.message is not None):
@@ -330,15 +342,18 @@ def telegram_viewb(request, extra):
                     # print(update.callback_query.message.inline_message_id)
                     print(str(e))
                 print(SETTINGS.GAME_URL+'/'+str(user.record_id))
-
-
-                bot.answerCallbackQuery(update.callback_query.id, url=SETTINGS.GAME_URL+'/'+str(user.record_id))
+                try:
+                    bot.answerCallbackQuery(update.callback_query.id, url=SETTINGS.GAME_URL+'/'+str(user.record_id))
+                    active_session_record.save()
+                except Exception as e:
+                    print(str(e))
+                    pass
                 # bot.answerCallbackQuery(update.callback_query.id, url=SETTINGS.GAME_URL)
             else:
                 print("Hello")
                 print(json_data)
                 # update.message.reply_game("coinmergetest");
-                bot.send_game(update.effective_chat.id, 'coinmergetest')
+                bot.send_game(update.effective_chat.id, 'CoinsMerge')
             # TODO: do something with the message
             # bot.answerCallbackQuery()
 

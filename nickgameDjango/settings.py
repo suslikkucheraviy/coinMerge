@@ -29,7 +29,7 @@ ALLOWED_HOSTS = ['139.180.221.254', 'coingames.site']
 
 
 # Application definition
-
+AUTH_USER_MODEL = 'app.SiteUser'
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app'
 ]
+
+LOGIN_REDIRECT_URL='/admin'
+LOGOUT_REDIRECT_URL = "/accounts/login"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -137,7 +140,8 @@ STATICFILES_DIRS = ('/var/www/html/coingame/static',)
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-TOKEN = "5694657024:AAGMg8n82ovhR5eitwlu64fxHtk_Q8ZFf5A"
+# TOKEN = "5694657024:AAGMg8n82ovhR5eitwlu64fxHtk_Q8ZFf5A"
+TOKEN = "5944073858:AAEQBDelAnU6xurP5r52gASVOoBCzr0rIfA"
 CUSTOMTOKEN = "3889523fjud0385nn23850jn3495n3h4j693jd7395"
 URL = "https://coingames.site/"
 GAME_URL = "https://coingames.site/game"

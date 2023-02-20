@@ -133,8 +133,18 @@ table th{
     text-align: left;
 }
 
+.logout{
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    justify-content: right;
+    padding-right: 50px;
+    font-size: 11pt;
+}
+
 </style>
 <body>
+<div class="logout"><a href="{% url 'logout' %}">Log Out</a></div>
 <div id="statistics">
     <div class="stat_item">
         <div class="stat_label">Active Users (In last 24h)</div>
@@ -158,7 +168,7 @@ table th{
         <th colspan="1"><a href="/admin?avgsessionduration={{ filter_map.3 }}"> Average Duration (min)</a></th>
     </tr>
     {% for x in data %}
-    <tr onclick="openModal(this, '{{ x.user.record_id }}')">
+    <tr onclick="openModal(this, '{{ x.user.record_id }}', '{{ x.user.is_blocked }}')">
       <td>{{ x.user.username }}</td>
       <td>{{ x.user.first_name }}</td>
       <td>{{ x.user.last_name }}</td>
@@ -200,13 +210,50 @@ table th{
       <div class="modal_row"><div class="label">Sessions</div><div id="scount">SN</div></div>
       <div class="modal_row"><div class="label">Last Session Duration</div><div id="sdur">SN</div></div>
       <div class="modal_row"><div class="label">Average Session Duration</div><div id="sadur">SN</div></div>
-      <div id="action"><button>Block</button></div>
+      <div id="action"><button id="blocksw">Block</button></div>
   </div>
 
 </div>
 <script>
-// Get the modal
+function getCookie(name) {
+  if (!document.cookie) {
+    return null;
+  }
+
+  const xsrfCookies = document.cookie.split(';')
+    .map(c => c.trim())
+    .filter(c => c.startsWith(name + '='));
+
+  if (xsrfCookies.length === 0) {
+    return null;
+  }
+  return decodeURIComponent(xsrfCookies[0].split('=')[1]);
+}
+
+const csrfToken = getCookie('csrftoken');
+
 var modal = document.getElementById("myModal");
+var block_button = document.getElementById("blocksw");
+
+var action_command=["null", null];
+block_button.onclick = function(e){
+    if(action_command!=null){
+        let turl=""
+        if(action_command[1]=='False'){
+            turl="/admin/"+action_command[0].toString()+"/block"
+        }else{
+            turl="/admin/"+action_command[0].toString()+"/unblock"
+        }
+
+        fetch(turl, {
+          method: "POST",
+          headers: {'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken}
+        }).then(res => {
+          location.reload();
+        });
+    }
+};
 
 
 
@@ -214,7 +261,7 @@ var modal = document.getElementById("myModal");
 var span = document.getElementsByClassName("close")[0];
 
 // When the user clicks the button, open the modal
-function openModal(data, id) {
+function openModal(data, id, is_blocked) {
     console.log(data);
     document.getElementById('username').innerHTML=data.getElementsByTagName("td")[0].innerHTML;
     document.getElementById('fname').innerHTML=data.getElementsByTagName("td")[1].innerHTML;
@@ -224,17 +271,25 @@ function openModal(data, id) {
     document.getElementById('scount').innerHTML=data.getElementsByTagName("td")[5].innerHTML;
     document.getElementById('sdur').innerHTML=data.getElementsByTagName("td")[6].innerHTML;
     document.getElementById('sadur').innerHTML=data.getElementsByTagName("td")[7].innerHTML;
-  modal.style.display = "block";
+    if(is_blocked=='True'){
+        block_button.innerText="Unblock";
+    }else{
+        block_button.innerText="Block";
+    }
+    modal.style.display = "block";
+    action_command=[id, is_blocked];
 }
 
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() {
+    action_command=null;
   modal.style.display = "none";
 }
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
   if (event.target == modal) {
+      action_command=null;
     modal.style.display = "none";
   }
 }

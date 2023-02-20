@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+</head>
+<style>
+    @font-face {
+        font-family: GameFont;
+        src: url(/static/fonts/Paytone_One/PaytoneOne-Regular.ttf);
+    }
+
+    @font-face {
+        font-family: BuddyScoreFont;
+        src: url(/static/fonts/Anek_Gurmukhi/static/AnekGurmukhi/AnekGurmukhi-Regular.ttf);
+    }
+
+    #game_title{
+            font-family: GameFont;
+            font-size: 28pt;
+        }
+    html, body{
+        width: 100%;
+        height: 100%;
+        position: fixed;
+            /*background-color: #d3d3d3;*/
+        background-image: url("/static/assets/back.jpg");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        padding: 0px;
+        margin: 0px;
+        overflow: hidden;
+        color: white;
+        font-family: BuddyScoreFont;
+    }
+    .container{
+        display: flex;
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .formholder{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    label{
+        display: inline-block;
+        min-width: 12ch;
+    }
+
+    button{
+        margin-top: 20px;
+            color: white;
+            font-family: BuddyScoreFont;
+            {#font-size: 15pt;#}
+            width: 100%;
+            background-color: dodgerblue;
+            text-align: center;
+            padding-top: 3px;
+            height: 40px;
+            line-height: 40px;
+            border-radius: 15px;
+            border-width: 0px;
+    }
+
+    input{
+        background-color: rgba(255, 255, 255, 0.9);
+        border-width: 0px;
+        height: 30px;
+        line-height: 30px;
+    }
+
+</style>
+<body>
+<div class="container">
+    <div class="formholder">
+        <div id="game_title">CoinGame</div>
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit">Log In</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
