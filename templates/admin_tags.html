@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+</head>
+<style>
+    html{
+        font-family: Arial;
+    }
+
+    @font-face {
+        font-family: GameFont;
+        src: url(/static/fonts/Paytone_One/PaytoneOne-Regular.ttf);
+    }
+
+    @font-face {
+        font-family: BuddyScoreFont;
+        src: url(/static/fonts/Anek_Gurmukhi/static/AnekGurmukhi/AnekGurmukhi-Regular.ttf);
+    }
+
+    #statistics{
+        width: calc(100% - 100px);
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 50px;
+    }
+
+     #pager{
+        width: calc(100% - 100px);
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        padding: 50px;
+    }
+
+     .modal_row{
+         display: flex;
+         flex-direction: row;
+         margin-top: 5px;
+         margin-bottom: 5px;
+     }
+
+     .modal_row .label{
+         width: 50%;
+         min-width: 24ch;
+     }
+
+
+    #info{
+        display: flex;
+        justify-content: center;
+    }
+
+    .stat_item{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        {#background-color: rgb(74, 136, 218);#}
+        background-color: white;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 20px rgba(0,0,0, 0.2);
+    }
+
+    #action{
+        margin-top: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .stat_label{
+        color: black;
+        font-family: BuddyScoreFont;
+        font-size: 18pt;
+    }
+
+    .stat_value{
+        color: black;
+        font-family: BuddyScoreFont;
+        font-size: 24pt;
+    }
+
+    /* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+table{
+    width: calc(100% - 100px);
+}
+
+table th{
+    text-align: left;
+}
+
+.logout{
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    justify-content: right;
+    padding-right: 50px;
+    font-size: 11pt;
+}
+
+</style>
+<body>
+<div class="logout"><a href="{% url 'logout' %}">Log Out</a></div>
+<div id="statistics">
+    <div class="stat_item">
+        <div class="stat_label">Tag #</div>
+        <div class="stat_value"> {{ stats.tags_count }}</div>
+    </div>
+{#    <div class="stat_item">#}
+{#        <div class="stat_label">Total # of users</div>#}
+{#        <div class="stat_value"> {{ stats.totalNoUsers }}</div>#}
+{#    </div>#}
+</div>
+<div id="info">
+    <table>
+    <tr>
+      <th colspan="1">Tag</th>
+      <th colspan="1">Count</th>
+        <th colspan="1">Date</th>
+    </tr>
+    {% for x in data %}
+    <tr onclick="openModal(this, '{{ x.user.record_id }}', '{{ x.user.is_blocked }}')">
+      <td>{{ x.tag.tag }}</td>
+      <td>{{ x.tag.use_count }}</td>
+      <td>{{ x.tag.first_use_date }}</td>
+    </tr>
+    {% endfor %}
+    </table>
+
+</div>
+<div id="pager">
+    {% for x in pages %}
+        {% if x.1%}
+            <div onclick="">{{ x.0 }}</div>
+        {% elif x.0 == -1 %}
+            <div>...</div>
+        {% else %}
+            <div><a href="/admin/tag?p={{ x.0 }}">{{ x.0 }}</a></div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+function getCookie(name) {
+  if (!document.cookie) {
+    return null;
+  }
+
+  const xsrfCookies = document.cookie.split(';')
+    .map(c => c.trim())
+    .filter(c => c.startsWith(name + '='));
+
+  if (xsrfCookies.length === 0) {
+    return null;
+  }
+  return decodeURIComponent(xsrfCookies[0].split('=')[1]);
+}
+
+const csrfToken = getCookie('csrftoken');
+</script>
+</body>
+</html>

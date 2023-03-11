@@ -93,9 +93,13 @@ class GameSession(models.Model):
 class ActiveSessionLedger(models.Model):
     game_user=models.OneToOneField(GameUsers, on_delete = models.CASCADE, primary_key = True)
     game_session=models.ForeignKey(GameSession, on_delete=models.CASCADE, null=True)
-
     def getDuration(self):
         if(self.game_session==None):
             return 0
         else:
             return (self.game_session.getUpdateDuration())
+
+class Tag(models.Model):
+    tag = models.CharField(max_length=200, primary_key=True)
+    use_count = models.IntegerField(default=0)
+    first_use_date = models.DateTimeField(default=timezone.now)

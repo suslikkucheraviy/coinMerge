@@ -85,6 +85,32 @@ def admin(request):
     print(results)
     return render(request, "admin.html", {"current_filter":current_filter, "filter_map": filter_map,"stats": stats, "data": data, "pages": page_list})
 
+@login_required(login_url='/accounts/login')
+def admintag(request):
+    allsize=Tag.objects.count()
+    perpage=50
+    c_page=int(request.GET.get("p",1))
+    pages=round(allsize/perpage+0.5)
+    page_list=[(i, c_page==i) for i in range(1, pages+1)]
+
+    _tags=Tag.objects.all()[(c_page-1)*perpage:(c_page)*perpage]
+
+    data=[]
+    counter=0
+    for tag in _tags:
+        _data={}
+        _data['tag']=tag
+        data.append(_data)
+
+    #active users last 24h
+    time_threshold = datetime.datetime.now() - datetime.timedelta(hours=24)
+    results = ActiveSessionLedger.objects.filter(game_session__session_last_active__gt=time_threshold)
+    results=results.annotate(total=Count('game_user', distinct=True)).count()
+    stats={}
+    stats['tags_count']=allsize
+    print(results)
+    return render(request, "admin_tags.html", {"stats": stats, "data": data, "pages": page_list})
+
 def game(request):
     return render(request, 'indexMatter.html')
 
@@ -241,10 +267,13 @@ def gamescore(request, userid):
         user=GameUsers.objects.get(record_id=userid)
         data = json.loads(request.body)
         print(user.message_id)
-        if(user.is_message):
-            bot.setGameScore(user.id, data['score'], message_id=user.message_id, force=0)
-        else:
-            bot.setGameScore(user.id, data['score'], inline_message_id=user.message_id, force=0)
+        try:
+            if(user.is_message):
+                bot.setGameScore(user.id, data['score'], message_id=user.message_id, force=0)
+            else:
+                bot.setGameScore(user.id, data['score'], inline_message_id=user.message_id, force=0)
+        except Exception as e:
+            print(str(e))
         # bot.setGameScore(user_id=user.id, score=data['score'], message_id=user.message_id, chat_id=user.id)
         user.score=data['score']
         user.save()
@@ -287,6 +316,7 @@ def telegram_view(request, extra):
 @csrf_exempt
 def telegram_viewb(request, extra):
     if (request.method == 'POST'):
+        print(request.POST.keys())
         if (extra == SETTINGS.CUSTOMTOKEN):
             json_data = json.loads(request.body)
             update = telegram.Update.de_json(json_data, bot)
@@ -352,6 +382,17 @@ def telegram_viewb(request, extra):
             else:
                 print("Hello")
                 print(json_data)
+                try:
+                    _search="/start "
+                    _tag_holder=json_data['message']['text']
+                    if(_search in _tag_holder):
+                        _tag=_tag_holder[len(_search):]
+                        print("TAG", _tag_holder[len(_search):])
+                        _tag_model, _created=Tag.objects.get_or_create(tag=_tag)
+                        _tag_model.use_count=_tag_model.use_count+1
+                        _tag_model.save()
+                except:
+                    pass
                 # update.message.reply_game("coinmergetest");
                 bot.send_game(update.effective_chat.id, 'CoinsMerge')
             # TODO: do something with the message
