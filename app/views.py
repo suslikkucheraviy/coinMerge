@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 import json
-import nickgameDjango.settings as SETTINGS
+import coinMerge.settings as SETTINGS
 from django.db.models import Avg, Count
 from django.views.decorators.csrf import csrf_exempt
 

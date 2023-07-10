@@ -1,1 +1,1 @@
-# nickgameDjango
+# coinMerge
