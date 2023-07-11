@@ -2,7 +2,7 @@
 # CoinMerge
 
 This project is designed for telegam game service.
-(The code can be modified and extended to rub on any platform).
+(The code can be modified and extended to run on any platform).
 
 ## Technology
 #### Django
