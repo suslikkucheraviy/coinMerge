@@ -62,9 +62,6 @@ def admin(request):
             u.save()
             _data['avg_sessions_time'] = round(last10AverageTime/60,2)
 
-            # print(">>>", user_sessions)
-            #
-            # print("len sessions", len(user_sessions))
             if(ledger.game_session!=None):
                 _data['session']=round(ledger.getDuration()/60, 2)
             else:
@@ -129,6 +126,8 @@ def gameuser(request, userid):
 @csrf_exempt
 def block(request, userid):
     if (request.method == 'POST'):
+        if (request.user.is_admin == False):
+            return HttpResponse(status=403)
         user=GameUsers.objects.get(record_id=userid)
         user.is_blocked=True
         user.save()
@@ -137,6 +136,8 @@ def block(request, userid):
 @csrf_exempt
 def unblock(request, userid):
     if (request.method == 'POST'):
+        if(request.user.is_admin == False):
+            return HttpResponse(status=403)
         user=GameUsers.objects.get(record_id=userid)
         user.is_blocked=False
         user.save()
@@ -160,7 +161,6 @@ def gameuser_ping(request, userid):
                 user.save()
         except Exception as e:
             print(str(e))
-        print("ping", userid)
         return HttpResponse(status=200)
 
 import base64
@@ -174,92 +174,56 @@ def buddy(request, userid):
             res=bot.getGameHighScores(user_id=user.id, inline_message_id=user.message_id)
         resp={}
         for u in res:
-            print(u)
-            print(u.user)
-            print(">>>", u.user.username, u.user.id)
             profpic=bot.getUserProfilePhotos(u.user.id, limit=1)
             img_path='https://coingames.site/static/assets/1.png'
             if(profpic['total_count']>0):
-                # print()
                 img = bot.getFile(profpic['photos'][0][0]['file_id'])
-                print(img)
                 img_path=img['file_path']
                 img_data = requests.get(img_path).content
                 img_data  = base64.b64encode(img_data)
             else:
                 img_data = requests.get(img_path).content
                 img_data = base64.b64encode(img_data)
-                print(img_data)
-                # with open(img_path, "rb") as image:
-                #     img_data = base64.b64encode(image.read())
-
             resp[u.position]=[u.score, u.user.first_name, str(img_data)[2:-1]]
-        print(resp)
     return HttpResponse(json.dumps(resp), status=200)
 
 
+#Get Top 10 User Socres
 def liders(request, userid):
     if (request.method == 'GET'):
 
         #Get Top 10 User Socres
         top_10_users=GameUsers.objects.all().order_by('-score')[:10]
-        # user=GameUsers.objects.get(record_id=userid)
-        # if(user.is_message):
-        #     res = bot.getGameHighScores(user_id=user.id, message_id=user.message_id)
-        # else:
-        #     res=bot.getGameHighScores(user_id=user.id, inline_message_id=user.message_id)
         resp={}
         position=0
         if(True):
             for u in top_10_users:
                 position+=1
-                # print(u.username)
-                # profpic=bot.getUserProfilePhotos(u.id, limit=1)
-                # img_path='https://coingames.site/static/assets/10bitcoin.png'
-                # # if(profpic['total_count']>0):
-                # if(False):
-                #     # print(
-                #     img = bot.getFile(profpic['photos'][0][0]['file_id'])
-                #     print(img)
-                #     img_path=img['file_path']
-                #     img_data = requests.get(img_path).content
-                #     img_data  = base64.b64encode(img_data)
-                # else:
-                #     img_data = requests.get(img_path).content
-                #     img_data = base64.b64encode(img_data)
-                #     print(img_data)
-                #     # with open(img_path, "rb") as image:
-                #     #     img_data = base64.b64encode(image.read())
-
-                resp[position]=[u.score, u.username, u.id]#str(img_data)[2:-1]]
+                resp[position]=[u.score, u.username, u.id]
             print(position)
     return HttpResponse(json.dumps(resp), status=200)
 
+#get telegram profile user pic or default.
 def getProfileImage(request, userid):
-    # user = GameUsers.objects.get(record_id=userid)
     img_path = 'https://coingames.site/static/assets/1.png'
     try:
         profpic = bot.getUserProfilePhotos(userid, limit=1)
         if(profpic['total_count']>0):
-        # if(False):
-            # print(
             img = bot.getFile(profpic['photos'][0][0]['file_id'])
             print(img)
             img_path=img['file_path']
             img_data = requests.get(img_path).content
-            # img_data  = base64.b64encode(img_data)
         else:
             img_data = requests.get(img_path).content
-            # img_data = base64.b64encode(img_data)
-            # print(img_data)
-            # with open(img_path, "rb") as image:
-            #     img_data = base64.b64encode(image.read())
     except:
         img_data = requests.get(img_path).content
     response = HttpResponse(img_data, content_type="image/png")
-    # img_data.save(response, "PNG")
     return response
 
+#Record game score and share it with telegram.
+#Here we need @csrf_exempt to allow post from game user
+#It is possible to extend security by generating unique access token on each game start
+#and use it to verify eligibility of game making a score update request
 @csrf_exempt
 def gamescore(request, userid):
     if (request.method == 'POST'):
@@ -274,44 +238,17 @@ def gamescore(request, userid):
                 bot.setGameScore(user.id, data['score'], inline_message_id=user.message_id, force=0)
         except Exception as e:
             print(str(e))
-        # bot.setGameScore(user_id=user.id, score=data['score'], message_id=user.message_id, chat_id=user.id)
         user.score=data['score']
         user.save()
         print("saved")
         return HttpResponse(status=200)
 
-
-@csrf_exempt
-def telegram_view(request, extra):
-    if (request.method == 'POST'):
-        if (extra == SETTINGS.TOKEN):
-            json_data = json.loads(request.body)
-            update = telegram.Update.de_json(json_data, bot)
-            print(update)
-            if (update.callback_query is not None):
-                # print("PLAY BUTTON?")
-                # print(update.callback_query.id)
-                # print(update.callback_query.from_user)
-
-                bot.answerCallbackQuery(update.callback_query.id, url=SETTINGS.GAME_URL)
-            else:
-                print("Hello")
-                print(json_data)
-                # update.message.reply_game("coinmergetest");
-                bot.send_game(update.effective_chat.id, 'coinmergetest')
-            # TODO: do something with the message
-            # bot.answerCallbackQuery()
-
-    return HttpResponse("ok", status=200)
-#
-# def telegram_hook(request):
-#     print("Requesting Hook")
-#     s = bot.setWebhook('{URL}{HOOK}'.format(URL=SETTINGS.URL, HOOK=SETTINGS.CUSTOMTOKEN))
-#     print(s)
-#     if s:
-#         return "webhook ok"
-#     else:
-#         return "webhook failed"
+#If starts comminication with our bot, we register it in our database and provide unique uuid.
+#When game starts, we use basic user data to create link between telegram user and our game to provide basic feedbacks such as:
+#1. Game Score.
+#2. Profile Pics in Game.
+#3. Inline Game Info.
+#4. Internal Game Stats.
 
 @csrf_exempt
 def telegram_viewb(request, extra):
@@ -320,9 +257,6 @@ def telegram_viewb(request, extra):
         if (extra == SETTINGS.CUSTOMTOKEN):
             json_data = json.loads(request.body)
             update = telegram.Update.de_json(json_data, bot)
-            print(update)
-            # print(json_data['callback_query']['message']['chat'])
-            #
             if (update.callback_query is not None):
                 try:
                     user=GameUsers.objects.get(id=update.callback_query.from_user.id)
@@ -368,20 +302,13 @@ def telegram_viewb(request, extra):
                         user.is_message = False
                         user.save()
                 except Exception as e:
-                    print("Here")
-                    # print(update.callback_query.message.inline_message_id)
                     print(str(e))
-                print(SETTINGS.GAME_URL+'/'+str(user.record_id))
                 try:
                     bot.answerCallbackQuery(update.callback_query.id, url=SETTINGS.GAME_URL+'/'+str(user.record_id))
                     active_session_record.save()
                 except Exception as e:
-                    print(str(e))
                     pass
-                # bot.answerCallbackQuery(update.callback_query.id, url=SETTINGS.GAME_URL)
             else:
-                print("Hello")
-                print(json_data)
                 try:
                     _search="/start "
                     _tag_holder=json_data['message']['text']
@@ -393,11 +320,7 @@ def telegram_viewb(request, extra):
                         _tag_model.save()
                 except:
                     pass
-                # update.message.reply_game("coinmergetest");
                 bot.send_game(update.effective_chat.id, 'CoinsMerge')
-            # TODO: do something with the message
-            # bot.answerCallbackQuery()
-
     return HttpResponse("ok", status=200)
 
 @csrf_exempt
@@ -409,5 +332,3 @@ def telegram_test(request):
 
 
 from django.shortcuts import render
-
-# Create your views here.

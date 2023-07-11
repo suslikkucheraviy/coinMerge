@@ -5540,7 +5540,7 @@ var Collision = __webpack_require__(8);
             j;
 
         bodies.sort(Detector._compareBoundsX);
-
+        var _th=1;
         for (i = 0; i < bodiesLength; i++) {
             var bodyA = bodies[i],
                 boundsA = bodyA.bounds,
@@ -5555,16 +5555,33 @@ var Collision = __webpack_require__(8);
                 var bodyB = bodies[j],
                     boundsB = bodyB.bounds;
 
+                var _ism=bodyA.label==bodyB.label && bodyA.label.toString().startsWith('L');
+
                 if (boundsB.min.x > boundXMax) {
-                    break;
+                    if(_ism){
+                        if (boundsB.min.x > boundXMax+_th) {
+                            break
+                        }
+                    }else break;
                 }
 
                 if (boundYMax < boundsB.min.y || boundYMin > boundsB.max.y) {
+                    if(_ism){
+                        if (boundYMax +_th< boundsB.min.y || boundYMin > boundsB.max.y+_th) {
+                            continue
+                        }
+                    } else continue;
+                }
+
+                if (_ism==false && bodyAStatic && (bodyB.isStatic || bodyB.isSleeping)) {
                     continue;
                 }
 
-                if (bodyAStatic && (bodyB.isStatic || bodyB.isSleeping)) {
-                    continue;
+                if(_ism){
+                    if(canCollide(bodyA.collisionFilter, bodyB.collisionFilter)) {
+                        Events.trigger(engine, "circles", {bodyA: bodyA, bodyB: bodyB});
+                        continue;
+                    }
                 }
 
                 if (!canCollide(bodyA.collisionFilter, bodyB.collisionFilter)) {
