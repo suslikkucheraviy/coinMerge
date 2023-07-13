@@ -1,6 +1,30 @@
 let element=document.body;
 var computedStyle = getComputedStyle(element);
 
+var mergeSound = document.getElementById("merge-audio");
+var backSound = document.getElementById("back-audio");
+
+function playBackSound() {
+    backSound.addEventListener('ended', function() {
+        this.currentTime = 0; // Reset playback position to the beginning
+        this.play(); // Play the sound again
+    });
+    backSound.play();
+}
+
+function stopBackSound() {
+    backSound.stop();
+}
+
+function pauseBackSound() {
+    backSound.pause();
+}
+
+function playMergeSound() {
+    mergeSound.currentTime = 0;
+    mergeSound.play();
+}
+
 var object_scores = Object.create(null);
 object_scores['L1']=1;
 object_scores['L2']=2;
@@ -315,7 +339,8 @@ function linkHooks(){
                 nw.label = nl[1];
                 Composite.add(engine.world, nw);
             }
-            break
+            playMergeSound();
+            break;
         }
         wait_list=[];
     });
@@ -411,6 +436,7 @@ function loadImageRec(i){
 
 
 function stopGame(){
+    playBackSound();
     next_ball=null;
     document.getElementById('gameover').style.visibility='visible';
     if(is_paused)
@@ -447,6 +473,8 @@ function pause(){
 
     if(is_paused){
 
+        pauseBackSound();
+
         if(score>window.best_score){
             window.best_score=score;
             updategamescore();
@@ -461,6 +489,8 @@ function pause(){
         document.getElementById('gameover').style.visibility='visible';
         document.getElementById('current_score_value').innerHTML=score;
     }else{
+
+        playBackSound();
         document.getElementById('gameover').style.visibility='hidden';
         document.getElementById('continue').style.display='none';
         document.getElementById("score").style.display="block";
@@ -491,6 +521,7 @@ function resize(){
     }, 1);
 }
 function startGame(){
+    playBackSound();
     if(is_paused){
         Matter.World.clear(engine.world);
         Engine.clear(engine);
@@ -566,9 +597,9 @@ var open_shapshot=0;
 var views=["dashboard", "gameover"]
 
 function m(n,d){x=(''+n).length,p=Math.pow,d=p(10,d)
-x-=x%3
+    x-=x%3
     if(n<1000) return n;
-return Math.round(n*d/p(10,x))/d+" kMGTPE"[x/3]}
+    return Math.round(n*d/p(10,x))/d+" kMGTPE"[x/3]}
 
 function getLeadBoardGlobal(){
     let url = '/game/liders/'+window._uid;
