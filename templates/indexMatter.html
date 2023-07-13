@@ -389,6 +389,16 @@
     </style>
 </head>
 <body onload="getLeadBoard()">
+<audio id="merge-audio">
+    <source src="/static/assets/sounds/merge.wav" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<audio id="back-audio">
+    <source src="/static/assets/sounds/gameback.wav" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
 <script>
     window.best_score={{ bestScore }};
     window._uid= "{{ userid }}";
