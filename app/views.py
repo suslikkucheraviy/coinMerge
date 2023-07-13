@@ -6,13 +6,13 @@ from django.db.models import Avg, Count
 from django.views.decorators.csrf import csrf_exempt
 
 
-import telegram
+# import telegram  #python-telegram-bot 13.8.1
 import datetime
 from app.models import *
 from django.contrib.auth.decorators import login_required
 
-bot = telegram.Bot(token=SETTINGS.TOKEN)
-
+# bot = telegram.Bot(token=SETTINGS.TOKEN)
+bot=None
 @login_required(login_url='/accounts/login')
 def admin(request):
     allsize=GameUsers.objects.count()

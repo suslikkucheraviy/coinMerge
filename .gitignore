@@ -8,3 +8,8 @@ coinMerge/settings_with_keys.py
 .idea/modules.xml
 .idea/remote-mappings.xml
 .idea/vcs.xml
+coinMerge/__pycache__/*
+app/__pycache__/*
+*/*/__pycache__/*
+app/migrations/*
+coinMerge/settings_dev.py
