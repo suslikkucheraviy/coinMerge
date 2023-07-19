@@ -13,3 +13,5 @@ app/__pycache__/*
 */*/__pycache__/*
 app/migrations/*
 coinMerge/settings_dev.py
+.DS_Store
+coinMerge/settings_git_version.py
