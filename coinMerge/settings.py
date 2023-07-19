@@ -93,10 +93,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT= '/var/www/html/coingame/static_dep'
+STATIC_ROOT= '{root_dir}'
 
 #Source folder for STATIC_ROOT directory
-STATICFILES_DIRS = ('/var/www/html/coingame/static',)
+STATICFILES_DIRS = ('{static_source}',)
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
