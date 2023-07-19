@@ -390,12 +390,19 @@
 </head>
 <body onload="getLeadBoard()">
 <audio id="merge-audio">
-    <source src="/static/assets/sounds/merge.wav" type="audio/mpeg">
+    <source src="/static/assets/sounds/coin_merge.wav" type="audio/mpeg">
     Your browser does not support the audio element.
 </audio>
-
+<audio id="drop-audio">
+    <source src="/static/assets/sounds/coin_drop.wav" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
 <audio id="back-audio">
-    <source src="/static/assets/sounds/gameback.wav" type="audio/mpeg">
+    <source src="/static/assets/sounds/bgmusic.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+<audio id="gameover-audio">
+    <source src="/static/assets/sounds/game_over.wav" type="audio/mpeg">
     Your browser does not support the audio element.
 </audio>
 
@@ -450,7 +457,7 @@
 </div>
 
 <div id="pause" class="pause" onclick="pause()"></div>
-<script src="/static/js/gameV8.js"></script>
+<script src="/static/js/game.js"></script>
 <script>
     var intervalId = window.setInterval(function(){
         fetch('/game/'+_uid+"/ping", {
