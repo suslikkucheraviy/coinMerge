@@ -16,3 +16,5 @@ coinMerge/settings_dev.py
 .DS_Store
 coinMerge/settings_git_version.py
 *DS_Store
+/static/assets/sounds/gameback.wav
+/static/assets/sounds/merge.wav
